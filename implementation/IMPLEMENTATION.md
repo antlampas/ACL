@@ -1,3 +1,12 @@
+<!--
+Title: Sistema ACL - Specifica Implementativa
+Author/Licensor: Francesco
+Source: this repository
+License: Creative Commons Attribution-ShareAlike 4.0 International
+License URL: https://creativecommons.org/licenses/by-sa/4.0/
+SPDX-License-Identifier: CC-BY-SA-4.0
+-->
+
 # Sistema ACL - Specifica Implementativa
 
 ## 1. Scopo

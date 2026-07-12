@@ -1,4 +1,10 @@
 @startuml 03_ereditarieta_multi_padre
+' Title: Sistema ACL - 03_ereditarieta_multi_padre
+' Author/Licensor: Francesco
+' Source: this repository
+' License: Creative Commons Attribution-ShareAlike 4.0 International
+' License URL: https://creativecommons.org/licenses/by-sa/4.0/
+' SPDX-License-Identifier: CC-BY-SA-4.0
 !pragma layout smetana
 skinparam backgroundColor white
 skinparam nodesep 80
