@@ -30,7 +30,7 @@ AclService --> GrantPolicy : ALLOW protected
 AclService --> Repo : CRUD/replace/cascade
 DomainUseCase --> AclService : on_resource_created,\ndelete_by_resource
 AclService --> SeedingPolicy : entry iniziali
-BootstrapService --> AclService : ensure_bootstrap_entries
+BootstrapService --> AclService : materializza entry bootstrap
 ProfileAdmin --> Policy : richiede MANAGE_PROFILES
 
 note right of BootstrapService

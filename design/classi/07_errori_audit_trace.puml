@@ -15,17 +15,18 @@ hide empty members
 
 class DecisionTrace {
   +subject : SubjectRef
+  +profile : Profile
   +operation : OperationName
   +resource : ResourceRef
   +decision : Decision
-  +own_entries_found : bool
-  +matched_entries : list[ACLEntryId]
-  +visited_resources : list[ResourceRef]
   +reason : str
+  +explicit_deny : bool
+  +matched_entry_ids : list[ACLEntryId]
+  +visited_resources : list[ResourceRef]
 }
 
 abstract class ACLError
-class AuthenticationError
+class AuthenticationRequired
 class AuthorizationDenied
 class ACLValidationError
 class GrantConstraintError
@@ -47,7 +48,7 @@ class AuditRecord {
   +trace : DecisionTrace?
 }
 
-ACLError <|-- AuthenticationError
+ACLError <|-- AuthenticationRequired
 ACLError <|-- AuthorizationDenied
 ACLError <|-- ACLValidationError
 ACLError <|-- GrantConstraintError

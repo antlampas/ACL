@@ -25,7 +25,7 @@ class ACLEntryInvariants <<DomainPolicy>> {
 }
 
 interface GrantConstraintPolicy {
-  +validate_grant(caller, entry, operation_spec) : void
+  +validate_grant(grantor, grantor_profile, entry, operation) : void
 }
 
 class ACLService {

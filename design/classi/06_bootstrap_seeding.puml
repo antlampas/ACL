@@ -15,6 +15,10 @@ hide empty members
 
 class SeedingPolicy {
   +enabled : bool
+  +rules : map[str -> SeedRule]
+}
+
+class SeedRule {
   +resource_type : str
   +operations : set[OperationName]
   +grant_to : GrantTarget
@@ -34,15 +38,14 @@ class LevelStrategy <<Enum>> {
 }
 
 class BootstrapService {
-  +ensure_bootstrap_entries()
-  +create_first_admin()
+  +ensure_bootstrap_entries(config)
+  +create_initial_admin(input)
   +seed_system_global()
   +seed_type_roots()
 }
 
 class ACLService {
   +on_resource_created(resource, creator, resource_type)
-  +ensure_bootstrap_entries()
 }
 
 class BootstrapThresholds {
@@ -51,8 +54,9 @@ class BootstrapThresholds {
   +admin_threshold : int = 0
 }
 
-SeedingPolicy --> GrantTarget
-SeedingPolicy --> LevelStrategy
+SeedingPolicy --> SeedRule
+SeedRule --> GrantTarget
+SeedRule --> LevelStrategy
 ACLService --> SeedingPolicy
 BootstrapService --> ACLService
 BootstrapService --> BootstrapThresholds

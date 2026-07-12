@@ -160,6 +160,7 @@ Catalogo di esempio non normativo:
 | `UPLOAD` / `ASSIGN` | no | dipende dal dominio | no | Sistema, galleria, missione o altra risorsa target |
 | `MANAGE_ACL` | no | no | si | Risorsa concreta o `SYSTEM:global` |
 | `MANAGE_PROFILES` | no | no | si | `SYSTEM:global` |
+| `MANAGE_IDENTITIES` / `MANAGE_ACCOUNTS` | no | no | si | `SYSTEM:global` |
 | `EXECUTE` | no | no | si | `SYSTEM:global` per estensioni non mappate |
 
 ### 3.5 `Permission`
@@ -187,6 +188,12 @@ Conseguenze:
 - un `DENY` con soglia alta e' molto restrittivo, perche matcha molti profili;
 - `ANON_SENTINEL` e' il livello meno privilegiato e puo essere usato come
   **soglia universale**, soddisfatta da chiunque.
+
+`ANON_SENTINEL` e' un **valore riservato**: i profili ordinari (non anonimi) hanno
+`level` strettamente minore, cosi il sentinel identifica in modo univoco il
+profilo anonimo/meno privilegiato. Una entry puo invece usarlo legittimamente come
+soglia universale. Lo storage deve rappresentarlo con margine (vedi
+`implementation/IMPLEMENTATION.md` §4.1 e §7.1).
 
 La soglia universale serve per entry "legate al solo soggetto" rispettando
 INV-1. Esempio: `ALLOW VIEW USER(alice) level=ANON_SENTINEL` concede a `alice`
@@ -229,6 +236,11 @@ Profile(level = ANON_SENTINEL, groups = {"public"})
 Un soggetto non autenticato, inesistente, disabilitato o non verificabile riceve
 il profilo anonimo. In questo modo la valutazione non contiene rami speciali:
 anche l'anonimo passa dallo stesso algoritmo.
+
+`Profile.version` e' la versione autorevole del profilo; `RequestIdentity.authz_version`
+(sezione 3.9) e' lo snapshot trasportato dalla richiesta. Il confronto tra i due
+serve solo a invalidare cache/credenziali stantie e non partecipa alla decisione,
+che usa sempre il `Profile` risolto dal `ProfileProvider`.
 
 ### 3.9 Richieste autorizzative normalizzate
 
@@ -379,7 +391,11 @@ Algoritmo normativo:
    `DENIED`.
 
 ```text
-evaluate(resource) -> EvaluationResult:
+# chiamata iniziale: evaluate(resource, visited = {})
+evaluate(resource, visited) -> EvaluationResult:
+  if resource in visited:                      # guardia anti-ciclo obbligatoria
+    return EvaluationResult(DENIED)
+
   own = entries_for(resource, operation)
   if own:
     matching = [entry for entry in own if matches(entry, subject, profile)]
@@ -392,7 +408,8 @@ evaluate(resource) -> EvaluationResult:
   if not operation.inheritable:
     return EvaluationResult(DENIED)
 
-  parent_results = [evaluate(parent) for parent in parents_of(resource)]
+  parent_results = [evaluate(parent, visited | {resource})
+                    for parent in parents_of(resource)]
   if any(result.explicit_deny for result in parent_results):
     return EvaluationResult(DENIED, explicit_deny = true)
   if any(result.decision == ALLOWED for result in parent_results):
@@ -408,6 +425,16 @@ Il flag interno `explicit_deny` non cambia l'API pubblica, che restituisce
 `ALLOWED` o `DENIED`; serve alla policy e alla trace per distinguere un diniego
 causato da un `DENY` matchante da un semplice default deny. Solo il primo blocca
 le concessioni degli altri padri.
+
+Il risultato di `evaluate(resource)` per un dato `(operation, subject, profile)`
+non dipende dal ramo che raggiunge la risorsa: il `visited` serve solo a spezzare
+i cicli. In gerarchie a reticolo (padri multipli che condividono antenati, forma
+a diamante) la ricorsione ingenua rivaluta lo stesso antenato una volta per
+percorso, con costo che cresce rapidamente. L'implementazione **dovrebbe
+memoizzare i risultati di `evaluate` per risorsa entro la singola richiesta**:
+è sicuro perché il risultato dipende solo dalla risorsa (non dal cammino) e
+riduce la valutazione a lineare nel numero di risorse visitate. La cache resta
+scoped alla richiesta, coerente con la policy stateless.
 
 ### 5.3 Ereditarieta
 
@@ -490,13 +517,20 @@ Il seeding automatico risolve il problema materializzando entry ordinarie nella
 stessa transazione della creazione.
 
 ```text
-SeedingPolicy
-  enabled        : bool
+SeedRule
   resource_type  : str
   operations     : set[OperationName]
   grant_to       : CREATOR | CREATOR_GROUP | NONE
   level_strategy : UNIVERSAL | CREATOR_LEVEL | FIXED
+
+SeedingPolicy
+  enabled : bool
+  rules   : map[resource_type -> SeedRule]
 ```
+
+Una `SeedingPolicy` raccoglie una `SeedRule` per ciascun `resource_type` che il
+dominio consumatore vuole seminare; `on_resource_created` seleziona la regola in
+base al tipo della risorsa creata.
 
 Forma default per il creatore:
 
@@ -631,8 +665,12 @@ ACLService
   delete_by_resource(resource) -> None
   delete_by_subject(subject) -> None
   on_resource_created(resource, creator, resource_type) -> None
-  ensure_bootstrap_entries() -> None
 ```
+
+Le entry iniziali di sistema sono materializzate da `BootstrapService`
+(`ensure_bootstrap_entries(config)`, `create_initial_admin(input)`), non da
+`ACLService`: quest'ultimo resta l'unico punto di scrittura, ma il bootstrap è un
+flusso di setup separato che vi si appoggia.
 
 Regole:
 
@@ -843,7 +881,7 @@ Errori consigliati:
 
 | Errore | Significato | Esito di confine tipico |
 |--------|-------------|-------------------------|
-| `AuthenticationError` | identita richiesta ma assente/non valida | richiesta identita valida o avvia autenticazione esterna |
+| `AuthenticationRequired` | identita richiesta ma assente/non valida | richiesta identita valida o avvia autenticazione esterna |
 | `AuthorizationDenied` | identita valida ma accesso negato | nega senza rivelare dettagli interni |
 | `ACLValidationError` | entry viola INV-1..INV-7 | segnala input non valido |
 | `GrantConstraintError` | grant vietato da policy | nega o segnala grant non ammissibile |

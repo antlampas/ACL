@@ -138,6 +138,12 @@ Il package puo essere pubblicato come libreria autonoma. Gli adapter specifici
 vanno dichiarati come extra opzionali, per esempio `acl[sql]`, `acl[redis]`,
 `acl[identity]`, `acl[audit]`, `acl[test]`.
 
+Raccordo con il layout di repository: `acl/` è la **struttura interna autorevole a
+layer** del package. In un checkout, `AGENTS.md` e `README.md` raccomandano
+`src/`, `tests/`, `docs/`; le due viste non sono in conflitto: il package vive in
+`src/acl/`, i test in `tests/` e le note di supporto in `docs/`. La suddivisione a
+layer di questa sezione prevale sulla granularità generica `src/`.
+
 ---
 
 ## 4. Domain
@@ -166,6 +172,20 @@ ANON_SENTINEL = 2**31 - 1
 Il layer applicativo genera `ACLEntryId`. I repository non devono introdurre id
 nascosti che rendano non deterministica la serializzazione o il confronto nei
 test.
+
+`ANON_SENTINEL` (`2**31 - 1 = 2147483647`) è un **valore di livello riservato**:
+identifica il profilo meno privilegiato/anonimo e funge da soglia universale
+nelle entry. Conseguenze operative:
+
+- i profili ordinari (non anonimi) devono avere `level` **strettamente minore** di
+  `ANON_SENTINEL`, così il sentinel identifica in modo univoco l'anonimo; un
+  profilo reale con `level == ANON_SENTINEL` sarebbe indistinguibile dalla soglia
+  universale;
+- una entry può invece usare legittimamente `level = ANON_SENTINEL` come soglia
+  universale (criterio soddisfatto da chiunque);
+- lo storage deve rappresentare il sentinel con margine: `2**31 - 1` coincide
+  esattamente con `INT_MAX` a 32 bit, quindi la colonna `level` usa `BIGINT`
+  (vedi §7.1) per lasciare spazio ed evitare overflow in calcoli ai confini.
 
 ### 4.2 `SubjectRef`
 
@@ -565,6 +585,26 @@ Eventi minimi:
 L'audit non deve contenere segreti, credenziali, password o claim raw non
 necessari.
 
+### 5.9 `PrincipalBindingPort`
+
+Porta opzionale (dichiarata in `design/DESIGN.md` §6.2) che collega il principal
+verificato dal sottosistema Auth a un `SubjectRef` locale del dominio consumatore.
+
+```python
+class PrincipalBindingPort(Protocol):
+    def bind(self, principal_id: str) -> SubjectRef | None: ...
+```
+
+Regole:
+
+- è consultata da `IdentityResolver`, non dal core decisionale;
+- restituisce `None` quando il principal non ha un binding locale valido, così
+  l'identità resta anonima e la decisione ricade nel default deny;
+- il binding è esplicito e auditabile: un principal esterno non diventa mai un
+  `SubjectRef` privilegiato senza una regola dichiarata;
+- se un consumatore non distingue principal Auth ed entità locali può ometterla e
+  far produrre il `SubjectRef` direttamente all'`IdentityResolver`.
+
 ---
 
 ## 6. Application
@@ -726,17 +766,19 @@ Responsabilita:
 - non salvare entry e non modificare profili;
 - non interpretare il canale che ha originato la richiesta.
 
-`candidate_resources`:
+`candidate_resources` è **delegato a `AuthorizationPolicy.candidate_resources`**:
+`AuthorizationService` traduce solo `request.identity` in `SubjectRef` e non
+aggiunge logica di selezione. La policy:
 
 1. risolve il profilo del soggetto;
 2. carica entry `ALLOW` con `list_by_operation(request.operation, request.resource_type)`;
 3. filtra solo entry matchanti;
-4. deduplica e ordina le risorse;
-5. richiede al chiamante di rifinire ogni risorsa con `is_allowed`.
+4. deduplica e ordina le risorse.
 
-Il risultato non e' autorizzazione definitiva: non applica `DENY` di set
-decisivi diversi, `DENY` ereditati da altri rami padre, entry proprie non
-matchanti, ereditarieta completa o filtri di dominio.
+Il risultato è una pre-selezione, non un'autorizzazione definitiva: non applica
+`DENY` di set decisivi diversi, `DENY` ereditati da altri rami padre, entry
+proprie non matchanti, ereditarieta completa o filtri di dominio. Spetta al
+chiamante rifinire ogni risorsa con `is_allowed`.
 
 ### 6.3 `ACLService`
 
@@ -907,7 +949,7 @@ Tabella raccomandata `acl_entries`:
 | `resource_id` | string | `global`, `*` o id concreto |
 | `operation` | string | nome canonico uppercase |
 | `permission` | string | `ALLOW` o `DENY` |
-| `level` | integer nullable | `>= 0` |
+| `level` | bigint nullable | `>= 0`; `ANON_SENTINEL` è un valore riservato (§4.1) |
 | `group_id` | string nullable | non vuoto |
 | `profile_join` | string | `AND` o `OR` |
 | `subject_join` | string | `AND` o `OR` |
@@ -1109,6 +1151,19 @@ Regole:
 - le modifiche incrementano `Profile.version` se disponibile;
 - cache e credenziali esterne possono essere invalidate confrontando
   `authz_version`.
+
+Relazione tra i due campi versione:
+
+- `Profile.version` è la versione **autorevole e monotòna** assegnata dallo store
+  dei profili a ogni modifica di `level`/`groups`;
+- `RequestIdentity.authz_version` è lo **snapshot** catturato al momento
+  dell'autenticazione/emissione del token e trasportato dalla richiesta;
+- il confronto rileva lo _staleness_: se `authz_version` è più vecchio della
+  `Profile.version` corrente, cache e credenziali esterne che si appoggiano allo
+  snapshot vanno rinfrescate o rivalidate;
+- nessuno dei due partecipa alla **decisione pura**: la policy usa sempre il
+  `Profile` risolto dal `ProfileProvider`, non la versione trasportata dalla
+  richiesta.
 
 ---
 

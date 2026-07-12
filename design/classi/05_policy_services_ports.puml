@@ -35,7 +35,6 @@ class ACLService {
   +delete_by_resource(resource)
   +delete_by_subject(subject)
   +on_resource_created(resource, creator, resource_type)
-  +ensure_bootstrap_entries()
 }
 
 interface ACLEntryRepository

@@ -19,7 +19,7 @@ component "Denied / validation mapper" as Mapper
 queue "Audit sink" as Audit
 component "DecisionTrace" as Trace
 
-Require --> Mapper : AuthenticationError\nAuthorizationDenied
+Require --> Mapper : AuthenticationRequired\nAuthorizationDenied
 AclService --> Mapper : ACLValidationError\nGrantConstraintError
 Explain --> Trace
 Trace --> Audit : trace amministrativa

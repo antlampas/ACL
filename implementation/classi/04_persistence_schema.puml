@@ -21,7 +21,7 @@ class AclEntryRow <<table>> {
   +resource_id: string
   +operation: string
   +permission: string
-  +level: integer?
+  +level: bigint?
   +group_id: string?
   +profile_join: string
   +subject_join: string

@@ -22,7 +22,7 @@ else (no)
 endif
 if (gate autorizzato?) then (si)
   :Normalizza default profile_join=OR e subject_join=AND;
-  :Valida INV-1..INV-6;
+  :Valida INV-1..INV-5 strutturali;
   if (Entry concede ALLOW su operation protected?) then (si)
     :Invoca GrantConstraintPolicy;
     if (Grant consentito?) then (si)

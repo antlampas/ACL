@@ -42,11 +42,13 @@ class JoinOp <<Enum>> {
 
 class DecisionTrace {
   +subject : SubjectRef
+  +profile : Profile
   +operation : OperationName
   +resource : ResourceRef
   +decision : Decision
+  +reason : str
   +explicit_deny : bool
-  +matched_entries : list[ACLEntryId]
+  +matched_entry_ids : list[ACLEntryId]
   +visited_resources : list[ResourceRef]
 }
 

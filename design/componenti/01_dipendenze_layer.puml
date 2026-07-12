@@ -22,8 +22,9 @@ component "Domain" as Domain
 component "Adapter implementations" as AdapterImpl
 
 Adapters --> RequestNormalizer
-RequestNormalizer --> AuthService
+Adapters --> AuthService
 Adapters --> AclService
+RequestNormalizer --> Domain
 AuthService --> Policy
 AclService --> Policy
 AclService --> Ports

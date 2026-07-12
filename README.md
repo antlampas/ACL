@@ -30,6 +30,12 @@ tests/      test automatici
 docs/       note progettuali di supporto
 ```
 
+Il package ACL a layer descritto in
+[implementation/IMPLEMENTATION.md](implementation/IMPLEMENTATION.md) (§3) vive
+dentro `src/` come `src/acl/`: `src/`/`tests/`/`docs/` è la vista di repository, la
+suddivisione a layer (`domain`, `ports`, `application`, `infrastructure`,
+`adapters`, `bootstrap`) è la struttura interna autorevole del package.
+
 ## Struttura
 
 - [design/DESIGN.md](design/DESIGN.md): documento architetturale di
