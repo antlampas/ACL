@@ -1,0 +1,42 @@
+@startuml 05_listare_risorse_candidate
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title UC-05 - Listare risorse candidate
+skinparam shadowing false
+
+actor "Richiedente" as User
+actor "Dominio consumatore" as Domain
+actor "ACLEntryRepository" as Repo
+actor "AuthorizationPolicy" as Policy
+
+rectangle "candidate_resources" {
+  usecase "Richiedere candidati\nper operazione e tipo" as UCAsk
+  usecase "Prefiltrare entry\nALLOW matchanti" as UCPrefilter
+  usecase "Restituire risorse\ncandidate esplicite" as UCCandidates
+  usecase "Combinare con query\ndi dominio sui figli" as UCDomain
+  usecase "Filtrare ogni risultato\ncon is_allowed" as UCFinal
+}
+
+User --> Domain
+Domain --> UCAsk
+UCAsk --> Repo
+Repo --> UCPrefilter
+UCPrefilter --> UCCandidates
+UCCandidates --> UCDomain
+UCDomain --> UCFinal
+UCFinal --> Policy
+
+note right of UCFinal
+  La lista candidata non e' autorizzazione definitiva:
+  applica DENY, DENY ereditati da altri padri,
+  entry proprie non matchanti ed ereditarieta.
+end note
+
+legend
+  Vedi anche: [[../attivit%C3%A0/04_candidate_resources.puml ACT-04]] |
+  [[../componenti/06_persistenza_performance.puml Persistenza]] |
+  [[00_mappa_use_case.puml Indice UC]]
+endlegend
+@enduml

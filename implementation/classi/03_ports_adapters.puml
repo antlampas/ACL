@@ -1,0 +1,85 @@
+@startuml impl_cls_03_ports_adapters
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title IMPL-CLS-03 - Porte, adapter e contratti di confine
+skinparam shadowing false
+hide empty members
+
+interface ACLEntryRepository {
+  +entries_for(resource, operation): list[ACLEntry]
+  +list_by_operation(operation, resource_type): list[ACLEntry]
+  +save(entry): void
+  +delete(entry_id): void
+  +replace_entries(resource, entries): void
+}
+
+interface IdentityResolver {
+  +resolve(context): RequestIdentity
+}
+
+interface RequestNormalizer {
+  +authorization_request(context, identity): AuthorizationRequest
+  +candidate_resources_request(context, identity): CandidateResourcesRequest
+}
+
+interface ProfileProvider {
+  +profile_of(subject): Profile
+}
+
+interface ResourceHierarchyProvider {
+  +parents_of(resource): list[ResourceRef]
+}
+
+interface OperationCatalog {
+  +get(operation): OperationSpec
+  +require(operation): OperationSpec
+}
+
+interface GrantConstraintPolicy {
+  +validate_grant(grantor, grantor_profile, entry, operation): void
+}
+
+interface UnitOfWork {
+  +transaction(): ContextManager
+}
+
+interface AuditLogger {
+  +append(event): void
+}
+
+interface DeniedResponseMapper {
+  +map_error(error, context): object
+}
+
+class RequestMappingRule <<dataclass>> {
+  +selector: str
+  +operation: str
+  +resource_type: str?
+  +resource_id_source: str?
+  +service_enforced: bool
+  +fallback_protected: bool
+}
+
+RequestNormalizer --> RequestMappingRule
+RequestNormalizer ..> AuthorizationRequest
+IdentityResolver ..> RequestIdentity
+AuthorizationPolicy ..> ACLEntryRepository
+AuthorizationPolicy ..> ProfileProvider
+AuthorizationPolicy ..> ResourceHierarchyProvider
+AuthorizationPolicy ..> OperationCatalog
+ACLService ..> GrantConstraintPolicy
+ACLService ..> UnitOfWork
+ACLService ..> AuditLogger
+
+note bottom of RequestNormalizer
+  Il normalizzatore fallisce chiuso
+  se la richiesta e' assente o ambigua.
+end note
+
+legend
+  Vedi anche: [[../componenti/03_ports_infrastruttura.puml Componenti porte]] |
+  [[../attivita/04_normalizzazione_richiesta.puml ACT-04]]
+endlegend
+@enduml

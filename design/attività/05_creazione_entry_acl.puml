@@ -1,0 +1,44 @@
+@startuml 05_creazione_entry_acl
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title ACT-05 - Creare o aggiornare una entry ACL
+skinparam shadowing false
+
+start
+:Ricevi identity e input entry;
+:Determina risorsa target;
+if (Target e' SYSTEM:global o <TYPE>:*?) then (si)
+  :Richiedi MANAGE_ACL su SYSTEM:global;
+else (no)
+  :Richiedi MANAGE_ACL sulla risorsa concreta o su SYSTEM:global;
+endif
+if (gate autorizzato?) then (si)
+  :Normalizza default profile_join=OR e subject_join=AND;
+  :Valida INV-1..INV-6;
+  if (Entry concede ALLOW su operation protected?) then (si)
+    :Invoca GrantConstraintPolicy;
+    if (Grant consentito?) then (si)
+      :Continua;
+    else (no)
+      :GrantConstraintError;
+      stop
+    endif
+  else (no)
+    :Nessun grant protected;
+  endif
+  :Persisti create/update/replace atomico;
+  :Registra evento ACL_ENTRY_*;
+  stop
+else (no)
+  :AuthorizationDenied;
+  stop
+endif
+
+legend
+  Vedi anche: [[../use%20case/02_gestire_entry_acl.puml UC-02]] |
+  [[09_grant_protetti.puml ACT-09]] |
+  [[../classi/04_invarianti_grant.puml Invarianti]]
+endlegend
+@enduml

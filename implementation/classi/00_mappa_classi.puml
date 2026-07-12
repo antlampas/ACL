@@ -1,0 +1,27 @@
+@startuml impl_cls_00_mappa_classi
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title IMPL-CLS-00 - Mappa classi implementative
+skinparam shadowing false
+
+package "Classi implementative" {
+  class "01_domain_objects.puml" as Domain
+  class "02_policy_service_dto.puml" as Services
+  class "03_ports_adapters.puml" as Ports
+  class "04_persistence_schema.puml" as Persistence
+}
+
+Domain --> Services
+Services --> Ports
+Ports --> Persistence
+Persistence --> Domain
+
+legend
+  Navigazione: [[01_domain_objects.puml Domain]] |
+  [[02_policy_service_dto.puml Service/DTO]] |
+  [[03_ports_adapters.puml Porte/adapter]] |
+  [[04_persistence_schema.puml Persistenza]]
+endlegend
+@enduml

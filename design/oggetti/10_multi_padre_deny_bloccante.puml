@@ -1,0 +1,81 @@
+@startuml 10_multi_padre_deny_bloccante
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title OBJ-10 - Multi-padre con DENY bloccante
+skinparam shadowing false
+
+object "task314 : ResourceRef" as Task {
+  type = TASK
+  id = 314
+}
+
+object "project7 : ResourceRef" as Project {
+  type = PROJECT
+  id = 7
+}
+
+object "workspace3 : ResourceRef" as Workspace {
+  type = WORKSPACE
+  id = 3
+}
+
+object "allowProject : ACLEntry" as AllowProject {
+  subject = PUBLIC
+  resource = "PROJECT:7"
+  operation = VIEW
+  permission = ALLOW
+  group = editors
+}
+
+object "denyWorkspace : ACLEntry" as DenyWorkspace {
+  subject = "USER(bob)"
+  resource = "WORKSPACE:3"
+  operation = VIEW
+  permission = DENY
+  level = ANON_SENTINEL
+}
+
+object "bobProfile : Profile" as BobProfile {
+  level = 50
+  groups = {"public", "editors"}
+}
+
+object "projectBranch : EvaluationResult" as ProjectBranch {
+  decision = ALLOWED
+  explicit_deny = false
+}
+
+object "workspaceBranch : EvaluationResult" as WorkspaceBranch {
+  decision = DENIED
+  explicit_deny = true
+}
+
+object "decision : DecisionTrace" as Decision {
+  value = DENIED
+  explicit_deny = true
+  reason = "DENY da un padre blocca ALLOW di un altro padre"
+}
+
+Task --> Project : parents_of
+Task --> Workspace : parents_of
+AllowProject --> Project
+DenyWorkspace --> Workspace
+BobProfile --> AllowProject : groupMatch
+BobProfile --> DenyWorkspace : subjectMatch
+AllowProject --> ProjectBranch
+DenyWorkspace --> WorkspaceBranch
+ProjectBranch --> Decision
+WorkspaceBranch --> Decision
+
+note bottom of Decision
+  La valutazione non si ferma al primo ALLOW.
+  Tutti i padri vengono controllati prima di concedere.
+end note
+
+legend
+  Vedi anche: [[../attivit%C3%A0/03_ereditarieta_multi_padre.puml ACT-03]] |
+  [[04_deny_precedence.puml DENY precedence]]
+endlegend
+@enduml

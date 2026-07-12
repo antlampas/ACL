@@ -1,0 +1,48 @@
+@startuml impl_uc_00_mappa_use_case
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title IMPL-UC-00 - Use case implementativi
+skinparam shadowing false
+
+actor "Request adapter" as Adapter
+actor "Chiamante" as Caller
+actor "Gestore ACL" as AclAdmin
+actor "Bootstrap operator" as Bootstrap
+actor "Dominio consumatore" as Domain
+actor "Osservabilita" as Observability
+
+rectangle "Package ACL" {
+  usecase "Normalizzare\nrichiesta" as UCNormalize
+  usecase "Autorizzare\nAuthorizationRequest" as UCAuthorize
+  usecase "Listare candidate\nCandidateResourcesRequest" as UCCandidates
+  usecase "Gestire entry\nACL" as UCManage
+  usecase "Bootstrap e\nseeding" as UCBootstrap
+  usecase "Persistere e\nmigrare storage" as UCPersist
+  usecase "Audit e mapping\nerrori" as UCAudit
+}
+
+Caller --> Adapter
+Adapter --> UCNormalize
+UCNormalize --> UCAuthorize
+UCNormalize --> UCCandidates
+AclAdmin --> UCManage
+Bootstrap --> UCBootstrap
+Domain --> UCPersist
+Observability --> UCAudit
+
+UCManage ..> UCAuthorize : gate MANAGE_ACL
+UCCandidates ..> UCAuthorize : filtro finale
+UCBootstrap ..> UCManage : entry ordinarie
+UCAuthorize ..> UCAudit : dinieghi
+UCManage ..> UCAudit : mutazioni
+
+legend
+  Dettagli: [[01_autorizzare_richiesta.puml Autorizzare]] |
+  [[02_normalizzare_richiesta.puml Normalizzare]] |
+  [[03_gestire_entry_acl.puml Gestire ACL]] |
+  [[04_bootstrap_seeding.puml Bootstrap]] |
+  [[05_persistenza_audit.puml Persistenza/audit]]
+endlegend
+@enduml

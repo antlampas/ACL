@@ -1,0 +1,63 @@
+@startuml 05_identita_profili
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title CMP-05 - Identita, profili e claim esterni
+skinparam shadowing false
+skinparam componentStyle rectangle
+left to right direction
+
+package "Contesti identita" as Channels {
+  component "Credenziale esterna" as ExternalCredential
+  component "Principal locale\ntrusted" as LocalPrincipal
+  component "Contesto servizio" as ServiceContext
+  component "Contesto anonimo" as AnonymousContext
+}
+
+package "Risoluzione locale" as LocalResolution {
+  component "IdentityResolver\nRequestIdentity" as IdentityResolver
+  component "PrincipalBindingPort\nprincipal -> subject locale" as Binding
+  component "ProfileProvider\nProfile locale" as ProfileProvider
+}
+
+package "Fonti profilo" as Sources {
+  component "Profile store\nautorevole" as ProfileStore
+  component "External claim mapping\nallowlistato" as ClaimMapping
+  component "Provider identita\nesterno" as IdP
+}
+
+ExternalCredential --> IdentityResolver
+LocalPrincipal --> IdentityResolver
+ServiceContext --> IdentityResolver
+AnonymousContext --> IdentityResolver
+ExternalCredential --> IdP
+IdP --> ClaimMapping
+ClaimMapping --> ProfileStore
+IdentityResolver --> Binding
+ProfileProvider --> ProfileStore
+Binding --> ProfileProvider
+
+ExternalCredential -[hidden]down- LocalPrincipal
+LocalPrincipal -[hidden]down- ServiceContext
+ServiceContext -[hidden]down- AnonymousContext
+IdentityResolver -[hidden]down- Binding
+Binding -[hidden]down- ProfileProvider
+IdP -[hidden]down- ClaimMapping
+ClaimMapping -[hidden]down- ProfileStore
+
+note bottom of ProfileProvider
+  Se soggetto assente, inesistente, disabilitato o non verificabile:
+  Profile(level=ANON_SENTINEL, groups={"public"}).
+end note
+
+note bottom of Sources
+  I claim esterni sono hint non autorevoli.
+  Il profilo effettivo deriva dallo store locale.
+end note
+
+legend
+  Vedi anche: [[../attivit%C3%A0/10_risoluzione_profilo.puml ACT-10]] |
+  [[../classi/03_profili_permessi_decisioni.puml Classi profilo]]
+endlegend
+@enduml

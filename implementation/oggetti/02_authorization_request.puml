@@ -1,0 +1,44 @@
+@startuml impl_obj_02_authorization_request
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title IMPL-OBJ-02 - AuthorizationRequest normalizzata
+skinparam shadowing false
+
+object "context: InvocationContext" as Context {
+  selector = "document.view"
+  path_document_id = "doc-42"
+}
+
+object "identity: RequestIdentity" as Identity {
+  subject = USER(alice)
+  authenticated = true
+  auth_method = external
+  authz_version = 12
+}
+
+object "rule: RequestMappingRule" as Rule {
+  selector = "document.view"
+  operation = VIEW
+  resource_type = DOCUMENT
+  resource_id_source = path_document_id
+  service_enforced = false
+}
+
+object "request: AuthorizationRequest" as Request {
+  identity = RequestIdentity(alice)
+  operation = VIEW
+  resource = DOCUMENT:doc-42
+}
+
+Context --> Identity : IdentityResolver.resolve
+Context --> Rule : selector
+Rule --> Request : RequestNormalizer
+Identity --> Request
+
+legend
+  Vedi anche: [[../attivita/04_normalizzazione_richiesta.puml ACT-04]] |
+  [[../componenti/02_pipeline_richiesta.puml Pipeline]]
+endlegend
+@enduml

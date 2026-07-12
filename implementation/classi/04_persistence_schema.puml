@@ -1,0 +1,68 @@
+@startuml impl_cls_04_persistence_schema
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title IMPL-CLS-04 - Schema persistenza ACL
+skinparam shadowing false
+hide empty members
+
+class AclEntryRow <<table>> {
+  +id: string/uuid
+  +subject_type: string
+  +subject_id: string?
+  +resource_type: string
+  +resource_id: string
+  +operation: string
+  +permission: string
+  +level: integer?
+  +group_id: string?
+  +profile_join: string
+  +subject_join: string
+  +created_at: datetime
+  +updated_at: datetime
+}
+
+class SqlAlchemyACLEntryRepository {
+  +entries_for(resource, operation)
+  +list_by_operation(operation, resource_type)
+  +list_by_resource(resource)
+  +save(entry)
+  +replace_entries(resource, entries)
+}
+
+class SqlUnitOfWork {
+  +transaction()
+}
+
+class AlembicMigration {
+  +create_acl_entries()
+  +create_indexes()
+  +create_checks()
+}
+
+class AclEntryMapper <<module>> {
+  +to_domain(row): ACLEntry
+  +to_row(entry): AclEntryRow
+}
+
+SqlAlchemyACLEntryRepository --> AclEntryRow
+SqlAlchemyACLEntryRepository --> AclEntryMapper
+SqlAlchemyACLEntryRepository --> SqlUnitOfWork
+AlembicMigration --> AclEntryRow
+AclEntryMapper ..> ACLEntry
+
+note right of AclEntryRow
+  Check minimi:
+  subject PUBLIC -> subject_id null
+  subject non PUBLIC -> subject_id not null
+  level >= 0
+  almeno level o group_id
+  PUBLIC non usa subject_join OR
+end note
+
+legend
+  Vedi anche: [[../componenti/04_persistenza_config_audit.puml Persistenza]] |
+  [[../oggetti/05_sql_row_mapping.puml Oggetto row]]
+endlegend
+@enduml

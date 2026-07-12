@@ -1,0 +1,64 @@
+@startuml 00_mappa_implementazione
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title IMPL-MAP-00 - Mappa specifica implementativa ACL
+skinparam shadowing false
+left to right direction
+
+rectangle "Documento sorgente" as Source {
+  rectangle "IMPLEMENTATION.md" as ImplDoc
+}
+
+rectangle "Use case" as UseCase {
+  rectangle "use case/00_mappa_use_case.puml" as UC00
+  rectangle "richieste, ACL, bootstrap" as UCMore
+}
+
+rectangle "Componenti" as Componenti {
+  rectangle "componenti/00_mappa_componenti.puml" as CMP00
+  rectangle "layer, runtime, adapter" as CMPMore
+}
+
+rectangle "Classi" as Classi {
+  rectangle "classi/00_mappa_classi.puml" as CLS00
+  rectangle "domain, service, porte" as CLSMore
+}
+
+rectangle "Attivita" as Attivita {
+  rectangle "attivita/00_mappa_attivita.puml" as ACT00
+  rectangle "policy, normalizzazione, CRUD" as ACTMore
+}
+
+rectangle "Oggetti" as Oggetti {
+  rectangle "oggetti/00_mappa_oggetti.puml" as OBJ00
+  rectangle "istanze implementative" as OBJMore
+}
+
+ImplDoc --> UC00
+ImplDoc --> CMP00
+ImplDoc --> CLS00
+ImplDoc --> ACT00
+ImplDoc --> OBJ00
+
+UC00 --> CMP00
+CMP00 --> CLS00
+CLS00 --> ACT00
+ACT00 --> OBJ00
+OBJ00 --> UC00
+
+note bottom
+  Questa mappa copre la specifica implementativa, non il design concettuale.
+  I diagrammi descrivono package Python, DTO applicativi, porte, adapter,
+  persistenza, normalizzazione richiesta e flussi service/policy.
+end note
+
+legend
+  Navigazione: [[use%20case/00_mappa_use_case.puml Use case]] |
+  [[componenti/00_mappa_componenti.puml Componenti]] |
+  [[classi/00_mappa_classi.puml Classi]] |
+  [[attivita/00_mappa_attivita.puml Attivita]] |
+  [[oggetti/00_mappa_oggetti.puml Oggetti]]
+endlegend
+@enduml

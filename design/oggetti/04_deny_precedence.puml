@@ -1,0 +1,51 @@
+@startuml 04_deny_precedence
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title OBJ-04 - Precedenza DENY su ALLOW
+skinparam shadowing false
+
+object "allowEditors : ACLEntry" as Allow {
+  subject = PUBLIC
+  resource = "DOC:123"
+  operation = VIEW
+  permission = ALLOW
+  group = editors
+}
+
+object "denyBob : ACLEntry" as Deny {
+  subject = "USER(bob)"
+  resource = "DOC:123"
+  operation = VIEW
+  permission = DENY
+  level = ANON_SENTINEL
+}
+
+object "bobProfile : Profile" as Profile {
+  level = 60
+  groups = {"public", "editors"}
+}
+
+object "ownSet : EntrySet" as OwnSet {
+  resource = "DOC:123"
+  operation = VIEW
+  contains = "allowEditors, denyBob"
+}
+
+object "decision : Decision" as Decision {
+  value = DENIED
+  reason = "DENY matchante nel set decisivo"
+}
+
+OwnSet o-- Allow
+OwnSet o-- Deny
+Allow --> Profile : match
+Deny --> Profile : match
+OwnSet --> Decision
+
+legend
+  Vedi anche: [[../attivit%C3%A0/01_valutazione_is_allowed.puml ACT-01]] |
+  [[03_utente_specifico_soglia_universale.puml Soglia universale]]
+endlegend
+@enduml

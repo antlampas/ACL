@@ -1,0 +1,38 @@
+@startuml impl_uc_04_bootstrap_seeding
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title IMPL-UC-04 - Bootstrap e seeding
+skinparam shadowing false
+
+actor "Bootstrap operator" as Bootstrap
+actor "Dominio consumatore" as Domain
+actor "BootstrapService" as BootstrapService
+actor "ACLService" as AclService
+actor "UnitOfWork" as Uow
+
+rectangle "Bootstrap e ciclo vita" {
+  usecase "Creare primo\nadmin" as UCAdmin
+  usecase "Seminare entry\nbootstrap" as UCEntries
+  usecase "Applicare\nSeedingPolicy" as UCSeed
+  usecase "Compensare se\ntransazione separata" as UCCompensate
+  usecase "Garantire\nidempotenza" as UCIdempotent
+}
+
+Bootstrap --> UCAdmin
+BootstrapService --> UCAdmin
+UCAdmin --> UCEntries
+AclService --> UCEntries
+Domain --> UCSeed
+UCSeed --> UCCompensate
+UCEntries --> UCIdempotent
+UCSeed --> UCIdempotent
+Uow --> UCEntries
+Uow --> UCSeed
+
+legend
+  Vedi anche: [[../attivita/05_bootstrap_seeding.puml ACT-05]] |
+  [[../oggetti/04_seed_creator.puml Oggetto seeding]]
+endlegend
+@enduml

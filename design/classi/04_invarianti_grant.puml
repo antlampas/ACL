@@ -1,0 +1,56 @@
+@startuml 04_invarianti_grant
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title CLS-04 - Invarianti strutturali e GrantConstraintPolicy
+skinparam shadowing false
+hide empty members
+
+class ACLEntryInvariants <<DomainPolicy>> {
+  +validate(entry, operation_spec) : void
+  +INV_1_has_level_or_group()
+  +INV_2_no_anonymous_mutating_allow()
+  +INV_3_valid_level_and_group()
+  +INV_4_valid_joins()
+  +INV_5_no_public_subject_or()
+  +INV_6_global_and_roots_need_global_manage()
+  +INV_7_protected_grants_checked()
+}
+
+interface GrantConstraintPolicy {
+  +validate_grant(caller, entry, operation_spec) : void
+}
+
+class ACLService {
+  +create_entry(identity, input)
+  +update_entry(identity, entry_id, changes)
+  +replace_entries(identity, resource, inputs)
+}
+
+class OperationSpec {
+  +protected : bool
+  +read_only : bool
+}
+
+class ACLValidationError
+class GrantConstraintError
+
+ACLService --> ACLEntryInvariants
+ACLService --> GrantConstraintPolicy : se ALLOW protected
+ACLEntryInvariants --> OperationSpec
+ACLEntryInvariants ..> ACLValidationError
+GrantConstraintPolicy ..> GrantConstraintError
+
+note right of GrantConstraintPolicy
+  Limita cosa puo essere concesso:
+  operazioni possedute, protected globali,
+  soglie non piu privilegiate del chiamante.
+end note
+
+legend
+  Vedi anche: [[../attivit%C3%A0/05_creazione_entry_acl.puml ACT-05]] |
+  [[../attivit%C3%A0/09_grant_protetti.puml ACT-09]] |
+  [[../use%20case/06_gestire_profili_grant_protetti.puml UC-06]]
+endlegend
+@enduml

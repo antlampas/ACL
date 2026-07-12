@@ -1,0 +1,58 @@
+@startuml 01_valutazione_is_allowed
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title ACT-01 - Algoritmo normativo is_allowed
+skinparam shadowing false
+
+start
+:Ricevi subject, operation, resource;
+:Risolvi OperationSpec da OperationCatalog;
+if (OperationSpec valida?) then (si)
+  :Risolvi Profile da ProfileProvider;
+  :Carica entry proprie per resource + operation;
+  if (Esistono entry proprie?) then (si)
+    :Filtra entry matchanti;
+    if (Almeno una DENY matchante?) then (si)
+      :Decision = DENIED;
+      stop
+    else (no)
+      if (Almeno una ALLOW matchante?) then (si)
+        :Decision = ALLOWED;
+        stop
+      else (no)
+        :Decision = DENIED;
+        stop
+      endif
+    endif
+  else (no)
+    if (operation.inheritable?) then (si)
+      :Risolvi padri con ResourceHierarchyProvider;
+      :Valuta ogni padre con guardia anti-ciclo;
+      if (Almeno un ramo padre ha DENY matchante?) then (si)
+        :Decision = DENIED;
+      else (no)
+        if (Almeno un padre ALLOWED?) then (si)
+          :Decision = ALLOWED;
+        else (no)
+          :Decision = DENIED;
+        endif
+      endif
+      stop
+    else (no)
+      :Decision = DENIED;
+      stop
+    endif
+  endif
+else (no)
+  :Errore di catalogo operazione;
+  stop
+endif
+
+legend
+  Vedi anche: [[02_match_entry.puml ACT-02]] |
+  [[03_ereditarieta_multi_padre.puml ACT-03]] |
+  [[../use%20case/01_autorizzare_operazione.puml UC-01]]
+endlegend
+@enduml

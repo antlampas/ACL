@@ -1,0 +1,35 @@
+@startuml 07_bootstrap_setup
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title ACT-07 - Bootstrap, default e primo amministratore
+skinparam shadowing false
+
+start
+:Sistema iniziale senza entry ACL;
+:Tutto e' deny-by-default;
+:Avvia setup unico controllato;
+if (Deployment OIDC-only?) then (si)
+  :Verifica issuer, audience, subject, dominio email o gruppo IdP allowlistato;
+else (no)
+  :Usa canale bootstrap locale controllato;
+endif
+:Crea primo amministratore;
+:Assegna level=0 o gruppo admins;
+:Semina entry SYSTEM:global per MANAGE_ACL, MANAGE_PROFILES e simili;
+:Semina entry <TYPE>:* per VIEW/LIST/EDIT/DELETE secondo soglie;
+:Registra BOOTSTRAP_COMPLETED;
+:Disabilita flusso di setup unico;
+stop
+
+note right
+  Le soglie di bootstrap sono solo input iniziale.
+  Dopo il bootstrap tutte le entry sono ordinarie e revocabili.
+end note
+
+legend
+  Vedi anche: [[../use%20case/03_bootstrap_primo_admin.puml UC-03]] |
+  [[../oggetti/09_bootstrap_admin.puml Oggetto bootstrap]]
+endlegend
+@enduml

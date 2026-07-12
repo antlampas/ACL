@@ -1,0 +1,34 @@
+@startuml 07_errori_audit
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title CMP-07 - Errori, trace e audit
+skinparam shadowing false
+
+component "AuthorizationService.require" as Require
+component "ACLService" as AclService
+component "AuthorizationPolicy.explain" as Explain
+component "Denied / validation mapper" as Mapper
+queue "Audit sink" as Audit
+component "DecisionTrace" as Trace
+
+Require --> Mapper : AuthenticationError\nAuthorizationDenied
+AclService --> Mapper : ACLValidationError\nGrantConstraintError
+Explain --> Trace
+Trace --> Audit : trace amministrativa
+AclService --> Audit : ACL_ENTRY_*
+Require --> Audit : AUTHZ_DENIED
+
+note bottom of Audit
+  Eventi minimi:
+  AUTHZ_DENIED, ACL_ENTRY_CREATED,
+  ACL_ENTRY_UPDATED, ACL_ENTRY_DELETED,
+  PROFILE_CHANGED, BOOTSTRAP_COMPLETED.
+end note
+
+legend
+  Vedi anche: [[../use%20case/07_spiegare_decisione_audit.puml UC-07]] |
+  [[../classi/07_errori_audit_trace.puml Classi errori/audit]]
+endlegend
+@enduml

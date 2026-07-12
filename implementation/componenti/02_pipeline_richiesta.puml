@@ -1,0 +1,39 @@
+@startuml impl_cmp_02_pipeline_richiesta
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title IMPL-CMP-02 - Pipeline richiesta normalizzata
+skinparam shadowing false
+skinparam componentStyle rectangle
+
+component "InvocationContext" as InvocationContext
+component "IdentityResolver" as IdentityResolver
+component "RequestNormalizer" as Normalizer
+component "AuthorizationRequest" as AuthorizationRequest
+component "CandidateResourcesRequest" as CandidateRequest
+component "AuthorizationService" as AuthService
+component "ACLService" as AclService
+component "DeniedResponseMapper" as ErrorMapper
+
+InvocationContext --> IdentityResolver : resolve(context)
+InvocationContext --> Normalizer : mapping rule
+IdentityResolver --> Normalizer : RequestIdentity
+Normalizer --> AuthorizationRequest
+Normalizer --> CandidateRequest
+AuthorizationRequest --> AuthService : require/is_allowed/explain
+CandidateRequest --> AuthService : candidate_resources
+AuthorizationRequest --> AclService : richieste autoprotette
+AuthService --> ErrorMapper : ACLError
+AclService --> ErrorMapper : ACLError
+
+note bottom of Normalizer
+  Se mapping assente o ambiguo:
+  ResourceMappingError o fallback conservativo.
+end note
+
+legend
+  Vedi anche: [[../attivita/04_normalizzazione_richiesta.puml ACT-04]] |
+  [[../use%20case/02_normalizzare_richiesta.puml UC-02]]
+endlegend
+@enduml

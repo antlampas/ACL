@@ -1,0 +1,31 @@
+@startuml impl_act_00_mappa_attivita
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title IMPL-ACT-00 - Mappa attivita implementative
+skinparam shadowing false
+
+start
+:InvocationContext o chiamata service;
+if (Richiesta autorizzativa?) then (si)
+  :[[01_authorization_request.puml ACT-01 AuthorizationRequest]];
+  :[[02_policy_evaluate.puml ACT-02 policy evaluate]];
+elseif (Gestione ACL?) then (si)
+  :[[03_creazione_entry_acl.puml ACT-03 create entry]];
+elseif (Normalizzazione?) then (si)
+  :[[04_normalizzazione_richiesta.puml ACT-04 normalizzazione]];
+elseif (Bootstrap o seeding?) then (si)
+  :[[05_bootstrap_seeding.puml ACT-05 bootstrap/seeding]];
+else (Liste candidate)
+  :[[06_candidate_resources.puml ACT-06 candidate_resources]];
+endif
+:Decisione, persistenza o errore applicativo;
+stop
+
+legend
+  Navigazione: [[../use%20case/00_mappa_use_case.puml Use case]] |
+  [[../componenti/00_mappa_componenti.puml Componenti]] |
+  [[../classi/00_mappa_classi.puml Classi]]
+endlegend
+@enduml

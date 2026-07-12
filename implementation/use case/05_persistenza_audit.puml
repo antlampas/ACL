@@ -1,0 +1,35 @@
+@startuml impl_uc_05_persistenza_audit
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title IMPL-UC-05 - Persistenza e audit
+skinparam shadowing false
+
+actor "Repository" as Repo
+actor "Storage SQL/JSON" as Storage
+actor "UnitOfWork" as Uow
+actor "AuditLogger" as Audit
+actor "DeniedResponseMapper" as Mapper
+
+rectangle "Infrastruttura" {
+  usecase "Mappare dataclass\nin righe" as UCMap
+  usecase "Applicare vincoli\nSQL" as UCConstraints
+  usecase "Eseguire\ntransazioni" as UCTransaction
+  usecase "Scrivere eventi\naudit" as UCAudit
+  usecase "Mappare errori\nal confine" as UCErrorMap
+}
+
+Repo --> UCMap
+UCMap --> Storage
+Storage --> UCConstraints
+Uow --> UCTransaction
+UCTransaction --> UCMap
+Audit --> UCAudit
+Mapper --> UCErrorMap
+
+legend
+  Vedi anche: [[../componenti/04_persistenza_config_audit.puml Componenti infra]] |
+  [[../oggetti/05_sql_row_mapping.puml Oggetto row]]
+endlegend
+@enduml

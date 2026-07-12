@@ -1,0 +1,43 @@
+@startuml 06_creazione_risorsa_seeding
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title ACT-06 - Creazione risorsa e seeding automatico
+skinparam shadowing false
+
+start
+:Caso d'uso di dominio riceve richiesta creazione;
+:Autorizza CREATE su SYSTEM:global o padre delegabile;
+if (CREATE consentito?) then (si)
+  :Crea risorsa di dominio;
+  :Invoca ACLService.on_resource_created;
+  if (SeedingPolicy.enabled?) then (si)
+    :Determina operazioni da seminare per resource_type;
+    if (grant_to == CREATOR?) then (si)
+      :Crea ALLOW per USER(creator) con level=ANON_SENTINEL;
+    elseif (grant_to == CREATOR_GROUP?) then (gruppo)
+      :Crea ALLOW per gruppo del creatore secondo policy;
+    else (NONE)
+      :Non crea entry di accesso ordinario;
+    endif
+    :Valida invarianti e persisti entry;
+  else (no)
+    :Nessun seeding;
+  endif
+  if (Transazione condivisa disponibile?) then (si)
+    :Commit risorsa + entry insieme;
+  else (no)
+    :Applica compensazione esplicita e idempotente se fallisce il seeding;
+  endif
+  stop
+else (no)
+  :AuthorizationDenied;
+  stop
+endif
+
+legend
+  Vedi anche: [[../use%20case/04_creare_risorsa_con_seeding.puml UC-04]] |
+  [[../oggetti/07_seeding_creator.puml Oggetto seeding]]
+endlegend
+@enduml

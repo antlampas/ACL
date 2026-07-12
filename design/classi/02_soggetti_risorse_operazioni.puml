@@ -1,0 +1,56 @@
+@startuml 02_soggetti_risorse_operazioni
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title CLS-02 - Soggetti, risorse e operazioni
+skinparam shadowing false
+hide empty members
+
+abstract class SubjectRef
+class "USER(id)" as UserSubject
+class "PUBLIC" as PublicSubject
+class "SERVICE(id)\nopzionale" as ServiceSubject
+
+abstract class ResourceRef
+class "SYSTEM:global" as SystemGlobal
+class "<TYPE>:*" as TypeRoot
+class "<TYPE>:<id>" as ConcreteResource
+
+class OperationSpec {
+  +name : OperationName
+  +read_only : bool
+  +inheritable : bool
+  +protected : bool
+}
+
+interface OperationCatalog {
+  +get(name) : OperationSpec
+}
+
+interface ResourceHierarchyProvider {
+  +parents_of(resource) : list[ResourceRef]
+}
+
+SubjectRef <|-- UserSubject
+SubjectRef <|-- PublicSubject
+SubjectRef <|-- ServiceSubject
+ResourceRef <|-- SystemGlobal
+ResourceRef <|-- TypeRoot
+ResourceRef <|-- ConcreteResource
+OperationCatalog --> OperationSpec
+ResourceHierarchyProvider --> ResourceRef
+ConcreteResource --> TypeRoot : puo ereditare da
+ConcreteResource --> ConcreteResource : padre dominio-specifico
+
+note right of OperationSpec
+  read_only guida INV-2.
+  inheritable abilita fallback ai padri.
+  protected attiva GrantConstraintPolicy sui grant.
+end note
+
+legend
+  Vedi anche: [[../attivit%C3%A0/03_ereditarieta_multi_padre.puml ACT-03]] |
+  [[../oggetti/06_radici_tipo_e_global.puml Oggetti radici/global]]
+endlegend
+@enduml

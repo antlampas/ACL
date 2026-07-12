@@ -1,0 +1,37 @@
+@startuml impl_uc_02_normalizzare_richiesta
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title IMPL-UC-02 - Normalizzare richiesta
+skinparam shadowing false
+
+actor "Chiamante" as Caller
+actor "Request adapter" as Adapter
+actor "IdentityResolver" as IdentityResolver
+actor "RequestNormalizer" as Normalizer
+
+rectangle "Confine interfaccia-agnostico" {
+  usecase "Acquisire\nInvocationContext" as UCContext
+  usecase "Risolvere\nRequestIdentity" as UCIdentity
+  usecase "Applicare\nRequestMappingRule" as UCRule
+  usecase "Costruire\nAuthorizationRequest" as UCAuthReq
+  usecase "Costruire\nCandidateResourcesRequest" as UCCandidateReq
+  usecase "Fallire chiuso\nse ambiguo" as UCClosed
+}
+
+Caller --> Adapter
+Adapter --> UCContext
+UCContext --> UCIdentity
+IdentityResolver --> UCIdentity
+UCIdentity --> UCRule
+Normalizer --> UCRule
+UCRule --> UCAuthReq
+UCRule --> UCCandidateReq
+UCRule --> UCClosed
+
+legend
+  Vedi anche: [[../attivita/04_normalizzazione_richiesta.puml ACT-04]] |
+  [[../componenti/02_pipeline_richiesta.puml Pipeline]]
+endlegend
+@enduml

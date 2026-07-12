@@ -1,0 +1,79 @@
+@startuml 00_modello_concettuale
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title CLS-00 - Modello concettuale ACL
+skinparam shadowing false
+hide empty members
+
+class ACLEntry <<Entity>> {
+  +id : ACLEntryId
+  +level : int?
+  +group : GroupId?
+  +profile_join : JoinOp = OR
+  +subject_join : JoinOp = AND
+}
+
+class SubjectRef <<ValueObject>> {
+  +kind : USER | PUBLIC | SERVICE
+  +id : str?
+}
+
+class ResourceRef <<ValueObject>> {
+  +type : str
+  +id : str | global | *
+}
+
+class OperationSpec <<ValueObject>> {
+  +name : OperationName
+  +read_only : bool
+  +inheritable : bool = true
+  +protected : bool = false
+}
+
+class Profile <<ValueObject>> {
+  +level : int
+  +groups : frozenset[GroupId]
+  +version : int?
+  +anonymous()
+}
+
+class GroupId <<ValueObject>>
+
+class Permission <<Enum>> {
+  ALLOW
+  DENY
+}
+
+class Decision <<Enum>> {
+  ALLOWED
+  DENIED
+}
+
+class JoinOp <<Enum>> {
+  AND
+  OR
+}
+
+ACLEntry --> SubjectRef : subject
+ACLEntry --> ResourceRef : resource
+ACLEntry --> OperationSpec : operation name
+ACLEntry --> Permission : permission
+ACLEntry --> JoinOp : joins
+Profile "1" o-- "*" GroupId : groups
+OperationSpec --> Decision : contribuisce a
+
+note bottom of ACLEntry
+  Unita atomica persistita:
+  chi, su cosa, quale operazione,
+  verdetto e criteri di profilo.
+end note
+
+legend
+  Navigazione: [[01_acl_entry.puml ACLEntry]] |
+  [[02_soggetti_risorse_operazioni.puml Subject/Resource/Operation]] |
+  [[03_profili_permessi_decisioni.puml Profili/decisioni]] |
+  [[../componenti/00_mappa_componenti.puml Componenti]]
+endlegend
+@enduml

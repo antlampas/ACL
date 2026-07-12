@@ -1,0 +1,63 @@
+@startuml 06_bootstrap_seeding
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title CLS-06 - SeedingPolicy e BootstrapService
+skinparam shadowing false
+hide empty members
+
+class SeedingPolicy {
+  +enabled : bool
+  +resource_type : str
+  +operations : set[OperationName]
+  +grant_to : GrantTarget
+  +level_strategy : LevelStrategy
+}
+
+class GrantTarget <<Enum>> {
+  CREATOR
+  CREATOR_GROUP
+  NONE
+}
+
+class LevelStrategy <<Enum>> {
+  UNIVERSAL
+  CREATOR_LEVEL
+  FIXED
+}
+
+class BootstrapService {
+  +ensure_bootstrap_entries()
+  +create_first_admin()
+  +seed_system_global()
+  +seed_type_roots()
+}
+
+class ACLService {
+  +on_resource_created(resource, creator, resource_type)
+  +ensure_bootstrap_entries()
+}
+
+class BootstrapThresholds {
+  +read_threshold : int = 100
+  +write_threshold : int = 50
+  +admin_threshold : int = 0
+}
+
+SeedingPolicy --> GrantTarget
+SeedingPolicy --> LevelStrategy
+ACLService --> SeedingPolicy
+BootstrapService --> ACLService
+BootstrapService --> BootstrapThresholds
+
+note right of SeedingPolicy
+  La creazione non introduce ownership implicita.
+  Materializza entry ordinarie, revocabili e ispezionabili.
+end note
+
+legend
+  Vedi anche: [[../attivit%C3%A0/06_creazione_risorsa_seeding.puml ACT-06]] |
+  [[../attivit%C3%A0/07_bootstrap_setup.puml ACT-07]]
+endlegend
+@enduml

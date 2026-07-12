@@ -1,0 +1,40 @@
+@startuml impl_uc_01_autorizzare_richiesta
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title IMPL-UC-01 - Autorizzare AuthorizationRequest
+skinparam shadowing false
+
+actor "Request adapter" as Adapter
+actor "AuthorizationService" as AuthService
+actor "AuthorizationPolicy" as Policy
+actor "Porte" as Ports
+
+rectangle "Autorizzazione applicativa" {
+  usecase "Ricevere\nAuthorizationRequest" as UCRequest
+  usecase "Estrarre\nRequestIdentity" as UCIdentity
+  usecase "Delegare a\npolicy.is_allowed" as UCPolicy
+  usecase "Convertire DENIED in\nAuthorizationDenied" as UCDenied
+  usecase "Produrre audit\nAUTHZ_DENIED" as UCAudit
+}
+
+Adapter --> UCRequest
+UCRequest --> UCIdentity
+AuthService --> UCRequest
+UCIdentity --> UCPolicy
+Policy --> UCPolicy
+Ports --> UCPolicy
+UCPolicy --> UCDenied
+UCDenied --> UCAudit
+
+note right of UCPolicy
+  La policy usa SubjectRef, OperationSpec,
+  Profile, ACLEntry e ResourceHierarchyProvider.
+end note
+
+legend
+  Vedi anche: [[../attivita/01_authorization_request.puml ACT-01]] |
+  [[../classi/02_policy_service_dto.puml Classi service/policy]]
+endlegend
+@enduml

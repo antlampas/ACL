@@ -1,0 +1,60 @@
+@startuml 03_utente_specifico_soglia_universale
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title OBJ-03 - Utente specifico con soglia universale
+skinparam shadowing false
+
+object "entryAliceView : ACLEntry" as Entry {
+  subject = "USER(alice)"
+  resource = "REPORT:7"
+  operation = VIEW
+  permission = ALLOW
+  level = ANON_SENTINEL
+  group = null
+  subject_join = AND
+}
+
+object "alice : SubjectRef" as Alice {
+  kind = USER
+  id = alice
+}
+
+object "aliceProfile : Profile" as AliceProfile {
+  level = 80
+  groups = {"public", "default"}
+}
+
+object "charlie : SubjectRef" as Charlie {
+  kind = USER
+  id = charlie
+}
+
+object "charlieProfile : Profile" as CharlieProfile {
+  level = 0
+  groups = {"public", "admins"}
+}
+
+object "decisionAlice : Decision" as DecisionAlice {
+  value = ALLOWED
+  reason = "subjectMatch e soglia universale"
+}
+
+object "decisionCharlie : Decision" as DecisionCharlie {
+  value = DENIED
+  reason = "subject non matcha anche se level privilegiato"
+}
+
+Entry --> Alice
+Entry --> AliceProfile
+Entry --> DecisionAlice
+Entry --> Charlie
+Entry --> CharlieProfile
+Entry --> DecisionCharlie
+
+legend
+  Vedi anche: [[../attivit%C3%A0/02_match_entry.puml ACT-02]] |
+  [[04_deny_precedence.puml DENY precedence]]
+endlegend
+@enduml

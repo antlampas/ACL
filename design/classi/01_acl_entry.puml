@@ -1,0 +1,68 @@
+@startuml 01_acl_entry
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title CLS-01 - ACLEntry e criteri componibili
+skinparam shadowing false
+hide empty members
+
+class ACLEntry {
+  +id : ACLEntryId
+  +subject : SubjectRef
+  +resource : ResourceRef
+  +operation : OperationName
+  +permission : Permission
+  +level : int?
+  +group : GroupId?
+  +profile_join : JoinOp = OR
+  +subject_join : JoinOp = AND
+}
+
+class "EntryMatcher" as EntryMatcher <<PureFunction>> {
+  +subject_matches(entry, subject) : bool
+  +profile_part_matches(entry, profile) : bool
+  +entry_matches(entry, subject, profile) : bool
+}
+
+class Profile {
+  +level : int
+  +groups : frozenset[GroupId]
+}
+
+class SubjectRef
+class ResourceRef
+class Permission <<Enum>> {
+  ALLOW
+  DENY
+}
+class JoinOp <<Enum>> {
+  AND
+  OR
+}
+
+ACLEntry --> SubjectRef
+ACLEntry --> ResourceRef
+ACLEntry --> Permission
+ACLEntry --> JoinOp
+EntryMatcher ..> ACLEntry
+EntryMatcher ..> Profile
+EntryMatcher ..> SubjectRef
+
+note right of EntryMatcher
+  subjectMatch:
+  PUBLIC oppure subject identico.
+
+  profilePart:
+  level <= soglia e/o group in groups,
+  combinati con profile_join.
+
+  matches:
+  subject_join(subjectMatch, profilePart).
+end note
+
+legend
+  Vedi anche: [[../attivit%C3%A0/02_match_entry.puml ACT-02]] |
+  [[../oggetti/03_utente_specifico_soglia_universale.puml Oggetto soglia universale]]
+endlegend
+@enduml

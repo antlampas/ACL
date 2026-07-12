@@ -1,0 +1,61 @@
+@startuml 03_normalizzazione_richieste
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title CMP-03 - Normalizzazione richieste
+skinparam shadowing false
+skinparam componentStyle rectangle
+
+package "Origini eterogenee" as Origins {
+  component "Attore umano" as HumanActor
+  component "Processo applicativo" as AppProcess
+  component "Servizio esterno" as ExternalService
+  component "Evento di dominio" as DomainEvent
+}
+
+package "Confine di normalizzazione" as Boundary {
+  component "InvocationContext\nopaco al core" as InvocationContext
+  component "IdentityResolver\nRequestIdentity" as IdentityResolver
+  component "RequestNormalizer\noperation + resource" as RequestNormalizer
+  component "AuthorizationRequest\nidentity + operation + resource" as AuthorizationRequest
+}
+
+package "Servizi applicativi" as Services {
+  component "AuthorizationService\nrequire(request)" as AuthService
+  component "ACLService\nrichieste gestione ACL" as AclService
+}
+
+component "DeniedResponseMapper\nesito esterno del chiamante" as DeniedMapper
+
+Origins --> InvocationContext
+
+InvocationContext --> IdentityResolver
+InvocationContext --> RequestNormalizer
+IdentityResolver --> AuthorizationRequest
+RequestNormalizer --> AuthorizationRequest
+AuthorizationRequest --> AuthService
+AuthorizationRequest --> AclService
+
+AuthService --> DeniedMapper
+AclService --> DeniedMapper
+
+HumanActor -[hidden]down- AppProcess
+AppProcess -[hidden]down- ExternalService
+ExternalService -[hidden]down- DomainEvent
+InvocationContext -[hidden]down- IdentityResolver
+IdentityResolver -[hidden]down- RequestNormalizer
+RequestNormalizer -[hidden]down- AuthorizationRequest
+AuthService -[hidden]down- AclService
+
+note bottom of DeniedMapper
+  Mapping scelto dal consumatore:
+  il core restituisce errori applicativi,
+  non esiti specifici di un canale.
+end note
+
+legend
+  Vedi anche: [[../use%20case/08_enforcement_richieste.puml UC-08]] |
+  [[../attivit%C3%A0/08_enforcement_boundary.puml ACT-08]]
+endlegend
+@enduml

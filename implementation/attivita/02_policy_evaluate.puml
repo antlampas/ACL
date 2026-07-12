@@ -1,0 +1,50 @@
+@startuml impl_act_02_policy_evaluate
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title IMPL-ACT-02 - AuthorizationPolicy.evaluate
+skinparam shadowing false
+
+start
+:operations.require(operation);
+:profiles.profile_of(subject);
+:evaluate(resource, visited=empty);
+if (resource gia visitata?) then (si)
+  :Decision DENIED per ciclo;
+  stop
+endif
+:entries.entries_for(resource, operation);
+if (Entry proprie presenti?) then (si)
+  :resolve(entries, subject, profile);
+  if (DENY matchante?) then (si)
+    :DENIED explicit_deny=true;
+  elseif (ALLOW matchante?) then (si)
+    :ALLOWED;
+  else (no)
+    :DENIED default;
+  endif
+  stop
+else (no)
+  if (operation.inheritable?) then (si)
+    :parents = hierarchy.parents_of(resource);
+    :Valuta tutti i padri;
+    if (Qualunque padre explicit_deny?) then (si)
+      :DENIED explicit_deny=true;
+    elseif (Almeno un padre ALLOWED?) then (si)
+      :ALLOWED;
+    else (no)
+      :DENIED default;
+    endif
+    stop
+  else (no)
+    :DENIED default;
+    stop
+  endif
+endif
+
+legend
+  Vedi anche: [[../classi/01_domain_objects.puml Domain]] |
+  [[../oggetti/03_multi_parent_deny.puml Oggetto multi-padre]]
+endlegend
+@enduml

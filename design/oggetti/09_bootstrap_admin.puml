@@ -1,0 +1,60 @@
+@startuml 09_bootstrap_admin
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title OBJ-09 - Bootstrap e primo amministratore
+skinparam shadowing false
+
+object "firstAdmin : SubjectRef" as FirstAdmin {
+  kind = USER
+  id = admin
+}
+
+object "adminProfile : Profile" as AdminProfile {
+  level = 0
+  groups = {"public", "admins"}
+}
+
+object "systemManageAcl : ACLEntry" as ManageAcl {
+  resource = "SYSTEM:global"
+  operation = MANAGE_ACL
+  permission = ALLOW
+  level = 0
+}
+
+object "systemManageProfiles : ACLEntry" as ManageProfiles {
+  resource = "SYSTEM:global"
+  operation = MANAGE_PROFILES
+  permission = ALLOW
+  group = admins
+}
+
+object "typeRootView : ACLEntry" as RootView {
+  resource = "MISSION:*"
+  operation = VIEW
+  permission = ALLOW
+  level = read_threshold
+}
+
+object "bootstrapCompleted : AuditRecord" as Audit {
+  event = BOOTSTRAP_COMPLETED
+}
+
+FirstAdmin --> AdminProfile
+AdminProfile --> ManageAcl : soddisfa level <= 0
+AdminProfile --> ManageProfiles : soddisfa group admins
+ManageAcl --> Audit
+ManageProfiles --> Audit
+RootView --> Audit
+
+note bottom of RootView
+  Le entry create dal bootstrap sono ordinarie:
+  dopo il setup si gestiscono tramite MANAGE_ACL globale.
+end note
+
+legend
+  Vedi anche: [[../use%20case/03_bootstrap_primo_admin.puml UC-03]] |
+  [[../attivit%C3%A0/07_bootstrap_setup.puml ACT-07]]
+endlegend
+@enduml

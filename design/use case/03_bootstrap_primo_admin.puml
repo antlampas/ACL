@@ -1,0 +1,43 @@
+@startuml 03_bootstrap_primo_admin
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title UC-03 - Bootstrap e primo amministratore
+skinparam shadowing false
+
+actor "Bootstrap operator" as Operator
+actor "IdP / OIDC\nopzionale" as IdP
+actor "Primo admin" as FirstAdmin
+
+rectangle "BootstrapService / ACLService" {
+  usecase "Avviare setup unico\ncontrollato" as UCSetup
+  usecase "Creare primo\namministratore" as UCCreateAdmin
+  usecase "Verificare claim IdP\nallowlistati" as UCVerifyIdP
+  usecase "Assegnare livello 0\no gruppo admins" as UCProfile
+  usecase "Seminare entry\nSYSTEM:global" as UCGlobalSeed
+  usecase "Seminare radici\n<TYPE>:*" as UCRootSeed
+  usecase "Chiudere bootstrap" as UCClose
+}
+
+Operator --> UCSetup
+UCSetup ..> UCCreateAdmin
+IdP --> UCVerifyIdP
+UCVerifyIdP ..> UCCreateAdmin : deployment OIDC-only
+UCCreateAdmin ..> UCProfile
+UCProfile ..> UCGlobalSeed
+UCGlobalSeed ..> UCRootSeed
+UCRootSeed ..> UCClose
+UCClose --> FirstAdmin
+
+note right of UCGlobalSeed
+  Stato iniziale senza entry: deny-by-default.
+  Le soglie create dal bootstrap sono entry ordinarie.
+end note
+
+legend
+  Vedi anche: [[../attivit%C3%A0/07_bootstrap_setup.puml ACT-07]] |
+  [[../oggetti/09_bootstrap_admin.puml Oggetto bootstrap]] |
+  [[00_mappa_use_case.puml Indice UC]]
+endlegend
+@enduml

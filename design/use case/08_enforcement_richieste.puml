@@ -1,0 +1,42 @@
+@startuml 08_enforcement_richieste
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title UC-08 - Enforcement su richieste normalizzate
+skinparam shadowing false
+
+actor "Originatore\nrichiesta" as Originator
+actor "Request adapter" as Adapter
+actor "Dominio\nconsumatore" as Domain
+
+rectangle "Adapter di confine" {
+  usecase "Ricevere\nInvocationContext" as UCInvocation
+  usecase "Risolvere\nRequestIdentity" as UCIdentity
+  usecase "Normalizzare in\nAuthorizationRequest" as UCNormalize
+  usecase "AuthorizationService.require" as UCRequire
+  usecase "ACLService\nper gestione ACL" as UCAclService
+  usecase "Mappare errore in\nesito esterno" as UCMapDenied
+}
+
+Originator --> Adapter
+Adapter --> UCInvocation
+Domain --> UCNormalize
+UCInvocation --> UCIdentity
+UCIdentity --> UCNormalize
+UCNormalize --> UCRequire
+UCNormalize --> UCAclService
+UCRequire --> UCMapDenied
+UCAclService --> UCMapDenied
+
+note bottom of UCMapDenied
+  Il core produce errori applicativi.
+  Il canale chiamante decide la rappresentazione esterna.
+end note
+
+legend
+  Vedi anche: [[../componenti/03_normalizzazione_richieste.puml Componenti richieste]] |
+  [[../attivit%C3%A0/08_enforcement_boundary.puml ACT-08]] |
+  [[00_mappa_use_case.puml Indice UC]]
+endlegend
+@enduml

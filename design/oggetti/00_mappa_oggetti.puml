@@ -1,0 +1,73 @@
+@startuml 00_mappa_oggetti
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title OBJ-00 - Mappa scenari oggetto ACL
+skinparam shadowing false
+
+object "Lettura pubblica" as PublicRead {
+  diagram = "01_lettura_pubblica"
+  entry = "ALLOW VIEW PUBLIC group=public"
+}
+
+object "Mutazione editors" as EditorsEdit {
+  diagram = "02_mutazione_gruppo_editors"
+  entry = "ALLOW EDIT PUBLIC group=editors"
+}
+
+object "Utente specifico" as UserUniversal {
+  diagram = "03_utente_specifico_soglia_universale"
+  entry = "ALLOW VIEW USER(alice) level=ANON_SENTINEL"
+}
+
+object "Precedenza DENY" as DenyWins {
+  diagram = "04_deny_precedence"
+  rule = "DENY > ALLOW > DENIED"
+}
+
+object "Ereditarieta" as Inheritance {
+  diagram = "05_ereditarieta_photo_gallery"
+  path = "PHOTO:id -> GALLERY:id -> PHOTO:*"
+}
+
+object "Multi-padre DENY bloccante" as MultiParentDeny {
+  diagram = "10_multi_padre_deny_bloccante"
+  rule = "DENY parentale blocca ALLOW sibling"
+}
+
+object "Radici e globale" as RootsGlobal {
+  diagram = "06_radici_tipo_e_global"
+  scope = "SYSTEM:global e <TYPE>:*"
+}
+
+object "Seeding creatore" as SeedCreator {
+  diagram = "07_seeding_creator"
+  owner = "nessuna ownership implicita"
+}
+
+object "Profilo anonimo" as Anonymous {
+  diagram = "08_profilo_anonimo"
+  profile = "ANON_SENTINEL + public"
+}
+
+object "Bootstrap admin" as Bootstrap {
+  diagram = "09_bootstrap_admin"
+  state = "entry ordinarie iniziali"
+}
+
+PublicRead --> EditorsEdit : PUBLIC non basta per mutare
+EditorsEdit --> Anonymous : anonimo escluso da INV-2
+UserUniversal --> DenyWins : grant revocabile con DENY
+DenyWins --> Inheritance : entry proprie chiudono decisione
+Inheritance --> MultiParentDeny : padri multipli conservativi
+MultiParentDeny --> RootsGlobal : fallback a padri e radici
+RootsGlobal --> Bootstrap : semina soglie iniziali
+Bootstrap --> SeedCreator : policy dopo setup
+
+legend
+  Navigazione: [[../use%20case/00_mappa_use_case.puml Use case]] |
+  [[../attivit%C3%A0/01_valutazione_is_allowed.puml Attivita]] |
+  [[../classi/00_modello_concettuale.puml Classi]]
+endlegend
+@enduml

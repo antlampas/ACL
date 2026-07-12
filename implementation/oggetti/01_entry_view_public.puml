@@ -1,0 +1,49 @@
+@startuml impl_obj_01_entry_view_public
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title IMPL-OBJ-01 - Entry VIEW pubblica
+skinparam shadowing false
+
+object "entry: ACLEntry" as Entry {
+  id = "acl-001"
+  subject = PUBLIC
+  resource = DOCUMENT:*
+  operation = VIEW
+  permission = ALLOW
+  level = null
+  group = public
+  profile_join = OR
+  subject_join = AND
+}
+
+object "subject: SubjectRef" as Subject {
+  type = PUBLIC
+  id = null
+}
+
+object "profile: Profile" as Profile {
+  level = ANON_SENTINEL
+  groups = {public}
+}
+
+object "result: EvaluationResult" as Result {
+  decision = ALLOWED
+  explicit_deny = false
+}
+
+Entry --> Subject
+Entry --> Profile : entry_matches
+Profile --> Result
+
+note bottom of Entry
+  Valida per lettura pubblica.
+  Non autorizzerebbe una mutazione anonima per INV-2.
+end note
+
+legend
+  Vedi anche: [[../classi/01_domain_objects.puml Domain]] |
+  [[../attivita/02_policy_evaluate.puml ACT-02]]
+endlegend
+@enduml

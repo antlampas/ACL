@@ -1,0 +1,42 @@
+@startuml 06_gestire_profili_grant_protetti
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title UC-06 - Gestire profili e grant protetti
+skinparam shadowing false
+
+actor "Amministratore profili" as AdminProfili
+actor "Delegato MANAGE_ACL" as Delegato
+actor "GrantConstraintPolicy" as GrantPolicy
+
+rectangle "Regole anti-escalation" {
+  usecase "Modificare livelli\ne gruppi" as UCProfiles
+  usecase "Richiedere\nMANAGE_PROFILES" as UCManageProfiles
+  usecase "Concedere operazione\nprotected" as UCProtectedGrant
+  usecase "Verificare cosa il\nchiamante puo concedere" as UCGrantCheck
+  usecase "Rifiutare self-escalation" as UCSelfEscalation
+  usecase "Ignorare claim esterni\nnon allowlistati" as UCExternalClaims
+}
+
+AdminProfili --> UCProfiles
+UCProfiles ..> UCManageProfiles
+Delegato --> UCProtectedGrant
+UCProtectedGrant --> GrantPolicy
+GrantPolicy --> UCGrantCheck
+UCGrantCheck ..> UCSelfEscalation
+UCProfiles ..> UCExternalClaims
+
+note bottom of UCGrantCheck
+  Esempi di policy:
+  non concedere operazioni non possedute,
+  non concedere protected senza globale,
+  non concedere soglie piu privilegiate della propria.
+end note
+
+legend
+  Vedi anche: [[../attivit%C3%A0/09_grant_protetti.puml ACT-09]] |
+  [[../classi/04_invarianti_grant.puml Invarianti e grant]] |
+  [[00_mappa_use_case.puml Indice UC]]
+endlegend
+@enduml

@@ -1,0 +1,62 @@
+@startuml impl_cmp_00_mappa_componenti
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title IMPL-CMP-00 - Mappa componenti implementativi
+skinparam shadowing false
+skinparam componentStyle rectangle
+left to right direction
+
+package "Adapters" as Adapters {
+  [requests] as Requests
+  [identity] as IdentityAdapter
+}
+
+package "Application" as Application {
+  [AuthorizationService] as AuthService
+  [AuthorizationPolicy] as Policy
+  [ACLService] as AclService
+  [BootstrapService] as BootstrapService
+}
+
+package "Ports" as Ports {
+  [Repositories] as RepoPorts
+  [Providers] as ProviderPorts
+  [Policies] as PolicyPorts
+  [Audit/UoW] as OpsPorts
+}
+
+package "Infrastructure" as Infrastructure {
+  [persistence] as Persistence
+  [profiles] as Profiles
+  [config] as Config
+  [audit] as Audit
+}
+
+package "Domain" as Domain {
+  [value objects] as ValueObjects
+  [matching] as Matching
+  [invariants] as Invariants
+}
+
+Requests --> IdentityAdapter
+Requests --> AuthService
+Requests --> AclService
+AuthService --> Policy
+AclService --> Policy
+BootstrapService --> AclService
+Application --> Ports
+Ports --> Domain
+Infrastructure ..|> Ports
+Infrastructure --> Domain
+Domain --> Matching
+Domain --> Invariants
+
+legend
+  Dettagli: [[01_package_layers.puml Layer]] |
+  [[02_pipeline_richiesta.puml Pipeline]] |
+  [[03_ports_infrastruttura.puml Porte/infra]] |
+  [[04_persistenza_config_audit.puml Persistenza]]
+endlegend
+@enduml

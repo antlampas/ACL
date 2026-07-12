@@ -1,0 +1,58 @@
+@startuml 05_ereditarieta_photo_gallery
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title OBJ-05 - Ereditarieta: PHOTO -> GALLERY -> PHOTO:*
+skinparam shadowing false
+
+object "photo42 : ResourceRef" as Photo {
+  type = PHOTO
+  id = 42
+}
+
+object "gallery9 : ResourceRef" as Gallery {
+  type = GALLERY
+  id = 9
+}
+
+object "photoRoot : ResourceRef" as PhotoRoot {
+  type = PHOTO
+  id = *
+}
+
+object "galleryEntry : ACLEntry" as GalleryEntry {
+  subject = PUBLIC
+  resource = "GALLERY:9"
+  operation = VIEW
+  permission = ALLOW
+  group = public
+}
+
+object "viewSpec : OperationSpec" as ViewSpec {
+  name = VIEW
+  read_only = true
+  inheritable = true
+}
+
+object "decision : Decision" as Decision {
+  value = ALLOWED
+  reason = "photo senza entry proprie eredita dal padre"
+}
+
+Photo --> Gallery : parents_of
+Gallery --> PhotoRoot : fallback possibile
+GalleryEntry --> Gallery
+ViewSpec --> Decision
+GalleryEntry --> Decision
+
+note bottom of Photo
+  Se PHOTO:42 avesse anche una sola entry propria per VIEW,
+  non erediterebbe VIEW dai padri.
+end note
+
+legend
+  Vedi anche: [[../attivit%C3%A0/03_ereditarieta_multi_padre.puml ACT-03]] |
+  [[06_radici_tipo_e_global.puml Radici/global]]
+endlegend
+@enduml

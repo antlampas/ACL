@@ -1,0 +1,79 @@
+@startuml 00_mappa_componenti
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title CMP-00 - Architettura Ports & Adapters
+skinparam shadowing false
+skinparam componentStyle rectangle
+left to right direction
+
+package "Confine / Richieste" as Enforcement {
+  [RequestAdapter] as RequestAdapter
+  [RequestNormalizer] as Normalizer
+  [DeniedResponseMapper] as DeniedMapper
+}
+
+package "Application Facade" as Facade {
+  [AuthorizationService] as AuthService
+  [ACLService] as AclService
+  [BootstrapService] as BootstrapService
+}
+
+package "Policy" as Policy {
+  [AuthorizationPolicy] as AuthPolicy
+}
+
+package "Ports" as Ports {
+  [ACLEntryRepository] as RepoPort
+  [IdentityResolver] as IdentityPort
+  [ProfileProvider] as ProfilePort
+  [ResourceHierarchyProvider] as HierarchyPort
+  [OperationCatalog] as CatalogPort
+  [GrantConstraintPolicy] as GrantPort
+  [PrincipalBindingPort] as BindingPort
+}
+
+package "Domain" as Domain {
+  [ACLEntry] as Entry
+  [SubjectRef] as Subject
+  [ResourceRef] as Resource
+  [OperationSpec] as Operation
+  [Profile] as Profile
+}
+
+RequestAdapter --> IdentityPort
+RequestAdapter --> Normalizer
+IdentityPort --> Normalizer : RequestIdentity
+Normalizer --> AuthService : AuthorizationRequest
+Normalizer --> AclService : richiesta gestione
+AuthService --> AuthPolicy
+AclService --> AuthPolicy
+AclService --> Ports
+BootstrapService --> AclService
+AuthPolicy --> Ports
+AuthPolicy --> Domain
+Ports --> Domain
+AuthService --> DeniedMapper
+AclService --> DeniedMapper
+
+note right of AuthPolicy
+  Decisione pura e stateless.
+  Cache, database, credenziali e protocolli restano fuori.
+end note
+
+note bottom
+  Relazioni principali:
+  Confine -> Facade: richiesta normalizzata
+  ACLService -> AuthorizationPolicy: gate MANAGE_ACL
+  ACLService -> Ports: CRUD, invarianti, grant
+  BootstrapService -> ACLService: semina iniziale
+  AuthorizationPolicy -> Ports/Domain: consulta e valuta
+end note
+
+legend
+  Navigazione: [[../use%20case/00_mappa_use_case.puml Use case]] |
+  [[../attivit%C3%A0/01_valutazione_is_allowed.puml Flusso is_allowed]] |
+  [[../classi/05_policy_services_ports.puml Classi policy/richieste]]
+endlegend
+@enduml

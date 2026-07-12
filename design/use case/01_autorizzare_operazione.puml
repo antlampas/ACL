@@ -1,0 +1,56 @@
+@startuml 01_autorizzare_operazione
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title UC-01 - Autorizzare una operazione
+skinparam shadowing false
+
+actor "Richiedente" as Richiedente
+actor "Request\nadapter" as Adapter
+actor "ProfileProvider" as ProfileProvider
+actor "OperationCatalog" as OperationCatalog
+actor "ResourceHierarchyProvider" as Hierarchy
+actor "ACLEntryRepository" as Repo
+
+rectangle "AuthorizationService / AuthorizationPolicy" {
+  usecase "Produrre\nAuthorizationRequest" as UCMappa
+  usecase "Risolvere subject\ne profile" as UCProfile
+  usecase "Risolvere\nOperationSpec" as UCSpec
+  usecase "Caricare entry\nproprie" as UCEntry
+  usecase "Applicare match,\nDENY > ALLOW" as UCMatch
+  usecase "Valutare padri\nse inheritable" as UCParents
+  usecase "Restituire\nALLOWED/DENIED" as UCDecision
+}
+
+Richiedente --> Adapter
+Adapter --> UCMappa
+UCMappa ..> UCProfile : include
+UCMappa ..> UCSpec : include
+UCProfile --> ProfileProvider
+UCSpec --> OperationCatalog
+UCEntry --> Repo
+UCParents --> Hierarchy
+UCProfile ..> UCEntry
+UCSpec ..> UCEntry
+UCEntry ..> UCMatch
+UCMatch ..> UCParents : solo se no entry proprie
+UCMatch ..> UCDecision
+UCParents ..> UCDecision
+
+note right of UCMatch
+  Regole chiave:
+  - default deny
+  - DENY prevale su ALLOW
+  - entry proprie chiudono la decisione
+  - DENY ereditato da un padre blocca ALLOW di altri padri
+  - PUBLIC non equivale ad anonimo autorizzato
+end note
+
+legend
+  Vedi anche: [[../attivit%C3%A0/01_valutazione_is_allowed.puml ACT-01]] |
+  [[../attivit%C3%A0/02_match_entry.puml ACT-02]] |
+  [[../classi/05_policy_services_ports.puml Classi policy/richieste]] |
+  [[00_mappa_use_case.puml Indice UC]]
+endlegend
+@enduml

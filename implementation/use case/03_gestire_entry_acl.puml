@@ -1,0 +1,39 @@
+@startuml impl_uc_03_gestire_entry_acl
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title IMPL-UC-03 - Gestire entry ACL
+skinparam shadowing false
+
+actor "Gestore ACL" as Admin
+actor "ACLService" as AclService
+actor "AuthorizationPolicy" as Policy
+actor "GrantConstraintPolicy" as Grants
+actor "Repository" as Repo
+
+rectangle "Gestione entry" {
+  usecase "Applicare default\nACLEntryInput" as UCDefaults
+  usecase "Richiedere\nMANAGE_ACL" as UCGate
+  usecase "Validare\nINV-1..INV-7" as UCInv
+  usecase "Validare grant\nprotected" as UCGrant
+  usecase "Salvare in\nUnitOfWork" as UCSave
+  usecase "Audit\nACL_ENTRY_*" as UCAudit
+}
+
+Admin --> AclService
+AclService --> UCDefaults
+UCDefaults --> UCGate
+Policy --> UCGate
+UCGate --> UCInv
+UCInv --> UCGrant
+Grants --> UCGrant
+UCGrant --> UCSave
+Repo --> UCSave
+UCSave --> UCAudit
+
+legend
+  Vedi anche: [[../attivita/03_creazione_entry_acl.puml ACT-03]] |
+  [[../classi/02_policy_service_dto.puml Classi service]]
+endlegend
+@enduml

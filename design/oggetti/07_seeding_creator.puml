@@ -1,0 +1,60 @@
+@startuml 07_seeding_creator
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title OBJ-07 - Entry seminate per il creatore
+skinparam shadowing false
+
+object "newResource : ResourceRef" as Resource {
+  type = TASK
+  id = 314
+}
+
+object "creator : SubjectRef" as Creator {
+  kind = USER
+  id = alice
+}
+
+object "policy : SeedingPolicy" as Policy {
+  enabled = true
+  resource_type = TASK
+  operations = {VIEW, EDIT, DELETE, MANAGE_ACL}
+  grant_to = CREATOR
+  level_strategy = UNIVERSAL
+}
+
+object "seedView : ACLEntry" as SeedView {
+  subject = "USER(alice)"
+  resource = "TASK:314"
+  operation = VIEW
+  permission = ALLOW
+  level = ANON_SENTINEL
+}
+
+object "seedManageAcl : ACLEntry" as SeedManage {
+  subject = "USER(alice)"
+  resource = "TASK:314"
+  operation = MANAGE_ACL
+  permission = ALLOW
+  level = ANON_SENTINEL
+}
+
+Policy --> SeedView
+Policy --> SeedManage
+Creator --> SeedView
+Creator --> SeedManage
+Resource <-- SeedView
+Resource <-- SeedManage
+
+note bottom of Policy
+  Non esiste ownership implicita:
+  il controllo nasce da entry ordinarie,
+  revocabili e ispezionabili.
+end note
+
+legend
+  Vedi anche: [[../use%20case/04_creare_risorsa_con_seeding.puml UC-04]] |
+  [[../attivit%C3%A0/06_creazione_risorsa_seeding.puml ACT-06]]
+endlegend
+@enduml

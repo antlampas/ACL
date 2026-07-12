@@ -1,0 +1,51 @@
+@startuml impl_obj_05_sql_row_mapping
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title IMPL-OBJ-05 - Mapping ACLEntry verso riga SQL
+skinparam shadowing false
+
+object "entry: ACLEntry" as Entry {
+  id = acl-001
+  subject = USER(alice)
+  resource = DOCUMENT:doc-42
+  operation = VIEW
+  permission = ALLOW
+  level = ANON_SENTINEL
+  group = null
+}
+
+object "row: AclEntryRow" as Row {
+  id = acl-001
+  subject_type = USER
+  subject_id = alice
+  resource_type = DOCUMENT
+  resource_id = doc-42
+  operation = VIEW
+  permission = ALLOW
+  level = 2147483647
+  group_id = null
+  profile_join = OR
+  subject_join = AND
+}
+
+object "repo: SqlAlchemyACLEntryRepository" as Repo {
+  mapper = AclEntryMapper
+  uow = SqlUnitOfWork
+}
+
+Entry --> Row : to_row
+Row --> Entry : to_domain
+Repo --> Row : save/get
+
+note right of Row
+  I vincoli SQL coprono solo invarianti strutturali.
+  INV-2 e INV-7 restano nel service.
+end note
+
+legend
+  Vedi anche: [[../classi/04_persistence_schema.puml Schema]] |
+  [[../componenti/04_persistenza_config_audit.puml Persistenza]]
+endlegend
+@enduml

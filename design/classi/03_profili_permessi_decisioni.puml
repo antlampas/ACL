@@ -1,0 +1,69 @@
+@startuml 03_profili_permessi_decisioni
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title CLS-03 - Profili, permessi e decisioni
+skinparam shadowing false
+hide empty members
+
+class Profile {
+  +level : int
+  +groups : frozenset[GroupId]
+  +version : int?
+  +anonymous() : Profile
+}
+
+class GroupId <<ValueObject>>
+class Level <<ValueObject>> {
+  +value : int >= 0
+}
+
+class Permission <<Enum>> {
+  ALLOW
+  DENY
+}
+
+class Decision <<Enum>> {
+  ALLOWED
+  DENIED
+}
+
+class JoinOp <<Enum>> {
+  AND
+  OR
+}
+
+class DecisionTrace {
+  +subject : SubjectRef
+  +operation : OperationName
+  +resource : ResourceRef
+  +decision : Decision
+  +explicit_deny : bool
+  +matched_entries : list[ACLEntryId]
+  +visited_resources : list[ResourceRef]
+}
+
+class EvaluationResult <<Internal>> {
+  +decision : Decision
+  +explicit_deny : bool
+}
+
+Profile o-- Level
+Profile "1" o-- "*" GroupId
+Permission --> Decision : contribuisce
+JoinOp --> Decision : combina criteri
+DecisionTrace --> Decision
+DecisionTrace --> EvaluationResult : registra
+EvaluationResult --> Decision
+
+note bottom of Profile
+  Ogni profilo include sempre il gruppo public.
+  L'anonimo usa ANON_SENTINEL, il livello meno privilegiato.
+end note
+
+legend
+  Vedi anche: [[../attivit%C3%A0/10_risoluzione_profilo.puml ACT-10]] |
+  [[../oggetti/08_profilo_anonimo.puml Oggetto anonimo]]
+endlegend
+@enduml

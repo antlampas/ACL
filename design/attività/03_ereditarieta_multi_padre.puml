@@ -1,0 +1,51 @@
+@startuml 03_ereditarieta_multi_padre
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title ACT-03 - Ereditarieta e padri multipli
+skinparam shadowing false
+
+start
+:La risorsa non ha entry proprie per l'operazione;
+if (operation.inheritable?) then (si)
+  :Ottieni parents_of(resource);
+  if (Lista padri vuota?) then (si)
+    :DENIED;
+    stop
+  else (no)
+    :Valuta tutti i padri con visited set anti-ciclo;
+    :Ogni ramo produce decision + explicit_deny;
+    if (Un ramo padre contiene DENY matchante?) then (si)
+      :DENIED;
+      stop
+    else (no)
+      if (Almeno un padre restituisce ALLOWED?) then (si)
+        :ALLOWED;
+        stop
+      else (no)
+        :DENIED;
+        stop
+      endif
+    endif
+  endif
+else (no)
+  :DENIED;
+  stop
+endif
+
+note right
+  Con padri multipli la OR e' non permissiva:
+  un DENY matchante in qualunque ramo padre
+  blocca le ALLOW degli altri padri.
+
+  Un default deny senza DENY matchante
+  non blocca invece gli altri rami.
+end note
+
+legend
+  Vedi anche: [[01_valutazione_is_allowed.puml ACT-01]] |
+  [[../oggetti/05_ereditarieta_photo_gallery.puml Oggetto gerarchia]] |
+  [[../componenti/02_policy_ports_interni.puml Policy/porte]]
+endlegend
+@enduml

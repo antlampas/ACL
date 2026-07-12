@@ -1,0 +1,38 @@
+@startuml impl_cmp_04_persistenza_config_audit
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title IMPL-CMP-04 - Persistenza, configurazione e audit
+skinparam shadowing false
+skinparam componentStyle rectangle
+
+database "acl_entries" as AclTable
+component "SqlAlchemy mapper" as SqlMapper
+component "Alembic migrations" as Alembic
+component "Config loader" as Loader
+component "Typed settings" as Settings
+component "OperationCatalog" as Catalog
+component "SeedingPolicy" as Seeding
+queue "Audit sink" as AuditSink
+component "AuditLogger" as AuditLogger
+
+SqlMapper --> AclTable : CRUD ACLEntry
+Alembic --> AclTable : schema + indici
+Loader --> Settings : YAML/TOML/JSON/env
+Settings --> Catalog : OperationSpec
+Settings --> Seeding : SeedRule
+AuditLogger --> AuditSink : AuditEvent
+
+note right of AclTable
+  Vincoli SQL:
+  enum testuali, level >= 0,
+  subject_id coerente,
+  almeno level o group_id.
+end note
+
+legend
+  Vedi anche: [[../oggetti/05_sql_row_mapping.puml Row mapping]] |
+  [[../use%20case/05_persistenza_audit.puml UC-05]]
+endlegend
+@enduml

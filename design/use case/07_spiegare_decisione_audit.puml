@@ -1,0 +1,36 @@
+@startuml 07_spiegare_decisione_audit
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title UC-07 - Spiegare decisione e audit
+skinparam shadowing false
+
+actor "Amministratore ACL" as Admin
+actor "Audit sink" as Audit
+actor "Utente finale" as EndUser
+
+rectangle "DecisionTrace / Audit" {
+  usecase "Richiedere explain" as UCExplain
+  usecase "Produrre traccia\ndi decisione" as UCTrace
+  usecase "Registrare eventi\ndi audit" as UCAudit
+  usecase "Nascondere trace a\nsoggetti non autorizzati" as UCHide
+}
+
+Admin --> UCExplain
+UCExplain ..> UCTrace
+UCTrace --> UCAudit
+UCAudit --> Audit
+EndUser --> UCHide
+
+note right of UCTrace
+  La trace puo rivelare struttura interna ACL.
+  Non va restituita a utenti finali non autorizzati.
+end note
+
+legend
+  Vedi anche: [[../classi/07_errori_audit_trace.puml Errori/audit]] |
+  [[../componenti/07_errori_audit.puml Componenti audit]] |
+  [[00_mappa_use_case.puml Indice UC]]
+endlegend
+@enduml

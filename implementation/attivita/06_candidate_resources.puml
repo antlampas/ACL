@@ -1,0 +1,39 @@
+@startuml impl_act_06_candidate_resources
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title IMPL-ACT-06 - candidate_resources
+skinparam shadowing false
+
+start
+:Ricevi CandidateResourcesRequest;
+:AuthorizationService estrae subject e operation;
+:AuthorizationPolicy risolve Profile;
+:repo.list_by_operation(operation, resource_type);
+:Filtra entry ALLOW matchanti;
+:Deduplica ResourceRef candidate;
+:Ordina in modo stabile;
+:Restituisci pre-selezione;
+while (Per ogni candidata esposta dal chiamante?) is (si)
+  :Richiama is_allowed su risorsa concreta;
+  if (ALLOWED?) then (si)
+    :Mantieni nel risultato finale;
+  else (no)
+    :Scarta;
+  endif
+endwhile (no)
+:Lista autorizzata dal chiamante;
+stop
+
+note right
+  La pre-selezione non sostituisce is_allowed:
+  DENY, entry proprie non matchanti ed ereditarieta
+  sono applicati dal filtro finale.
+end note
+
+legend
+  Vedi anche: [[../use%20case/01_autorizzare_richiesta.puml UC-01]] |
+  [[../componenti/03_ports_infrastruttura.puml Repository]]
+endlegend
+@enduml

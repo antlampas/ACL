@@ -1,0 +1,99 @@
+@startuml impl_cls_02_policy_service_dto
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title IMPL-CLS-02 - Policy, service e DTO applicativi
+skinparam shadowing false
+hide empty members
+
+class RequestIdentity <<dataclass>> {
+  +subject: SubjectRef
+  +authenticated: bool
+  +auth_method: str?
+  +authz_version: int?
+  +principal_id: str?
+  +credential_ref: str?
+}
+
+class AuthorizationRequest <<dataclass>> {
+  +identity: RequestIdentity
+  +operation: str
+  +resource: ResourceRef
+  +metadata: Mapping?
+}
+
+class CandidateResourcesRequest <<dataclass>> {
+  +identity: RequestIdentity
+  +operation: str
+  +resource_type: str
+  +metadata: Mapping?
+}
+
+class DecisionTrace <<dataclass>> {
+  +subject: SubjectRef
+  +profile: Profile
+  +operation: str
+  +resource: ResourceRef
+  +decision: Decision
+  +reason: str
+  +explicit_deny: bool
+  +matched_entry_ids: tuple
+  +visited_resources: tuple
+}
+
+class AuthorizationPolicy {
+  +is_allowed(subject, operation, resource): Decision
+  +candidate_resources(subject, operation, resource_type): list[ResourceRef]
+  +explain(subject, operation, resource): DecisionTrace
+}
+
+class AuthorizationService {
+  +is_allowed(request): bool
+  +require(request): void
+  +candidate_resources(request): list[ResourceRef]
+  +explain(request): DecisionTrace
+}
+
+class ACLService {
+  +list_entries(identity, resource)
+  +create_entry(identity, input)
+  +update_entry(identity, entry_id, patch)
+  +delete_entry(identity, entry_id)
+  +replace_entries(identity, resource, inputs)
+  +delete_by_resource(resource)
+  +delete_by_subject(subject)
+  +on_resource_created(resource, creator, resource_type)
+}
+
+class BootstrapService {
+  +ensure_bootstrap_entries(config): void
+  +create_initial_admin(input): SubjectRef
+}
+
+class SeedingPolicy <<dataclass>> {
+  +enabled: bool
+  +rules: Mapping[str, SeedRule]
+}
+
+AuthorizationRequest --> RequestIdentity
+AuthorizationRequest --> ResourceRef
+CandidateResourcesRequest --> RequestIdentity
+AuthorizationService --> AuthorizationPolicy
+AuthorizationService ..> AuthorizationRequest
+AuthorizationService ..> CandidateResourcesRequest
+AuthorizationPolicy --> DecisionTrace
+ACLService --> AuthorizationPolicy
+ACLService --> SeedingPolicy
+BootstrapService --> ACLService
+
+note bottom of AuthorizationService
+  Il service riceve richieste gia normalizzate
+  e non interpreta il canale di origine.
+end note
+
+legend
+  Vedi anche: [[../use%20case/01_autorizzare_richiesta.puml UC-01]] |
+  [[../attivita/01_authorization_request.puml ACT-01]]
+endlegend
+@enduml

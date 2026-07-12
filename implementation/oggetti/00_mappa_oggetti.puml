@@ -1,0 +1,27 @@
+@startuml impl_obj_00_mappa_oggetti
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title IMPL-OBJ-00 - Mappa oggetti implementativi
+skinparam shadowing false
+
+object "01_entry_view_public.puml" as Obj1
+object "02_authorization_request.puml" as Obj2
+object "03_multi_parent_deny.puml" as Obj3
+object "04_seed_creator.puml" as Obj4
+object "05_sql_row_mapping.puml" as Obj5
+
+Obj1 --> Obj2
+Obj2 --> Obj3
+Obj3 --> Obj4
+Obj4 --> Obj5
+
+legend
+  Navigazione: [[01_entry_view_public.puml Entry pubblica]] |
+  [[02_authorization_request.puml Request]] |
+  [[03_multi_parent_deny.puml Multi-padre]] |
+  [[04_seed_creator.puml Seeding]] |
+  [[05_sql_row_mapping.puml SQL row]]
+endlegend
+@enduml

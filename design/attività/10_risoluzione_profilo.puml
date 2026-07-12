@@ -1,0 +1,37 @@
+@startuml 10_risoluzione_profilo
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title ACT-10 - Risoluzione identita e profilo autorizzativo
+skinparam shadowing false
+
+start
+:IdentityResolver riceve InvocationContext normalizzato;
+if (Principal verificabile?) then (si)
+  :PrincipalBindingPort collega principal a SubjectRef locale;
+  if (Subject locale valido e abilitato?) then (si)
+    :ProfileProvider carica livello e gruppi autorevoli;
+    :Aggiunge sempre gruppo public;
+    :Restituisce Profile(level, groups, version?);
+    stop
+  else (no)
+    :Subject inesistente o disabilitato;
+  endif
+else (no)
+  :Identita assente o non verificabile;
+endif
+:Restituisce Profile.anonymous();
+:Profile(level=ANON_SENTINEL, groups={public});
+stop
+
+note right
+  Claim esterni come groups, roles o acl_level sono solo hint:
+  entrano nel profilo solo tramite mapping esplicito e auditable.
+end note
+
+legend
+  Vedi anche: [[../componenti/05_identita_profili.puml Componenti identita]] |
+  [[../oggetti/08_profilo_anonimo.puml Oggetto anonimo]]
+endlegend
+@enduml

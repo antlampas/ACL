@@ -1,0 +1,33 @@
+@startuml impl_act_05_bootstrap_seeding
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title IMPL-ACT-05 - BootstrapService e SeedingPolicy
+skinparam shadowing false
+
+start
+if (Repository ACL vuoto?) then (si)
+  :Crea primo amministratore controllato;
+  :Materializza entry bootstrap;
+  :Audit BOOTSTRAP_COMPLETED;
+else (no)
+  :Non sovrascrivere entry esistenti;
+endif
+if (Risorsa creata dal dominio?) then (si)
+  :ACLService.on_resource_created(resource, creator, type);
+  if (SeedingPolicy abilitata per type?) then (si)
+    :Genera entry ALLOW per creator;
+    :Valida invarianti e grant;
+    :Salva nella stessa transazione se possibile;
+  else (no)
+    :Nessuna entry di seeding;
+  endif
+endif
+stop
+
+legend
+  Vedi anche: [[../use%20case/04_bootstrap_seeding.puml UC-04]] |
+  [[../oggetti/04_seed_creator.puml Oggetto seeding]]
+endlegend
+@enduml

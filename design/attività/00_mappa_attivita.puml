@@ -1,0 +1,36 @@
+@startuml 00_mappa_attivita
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title ACT-00 - Indice dei flussi di attivita ACL
+skinparam shadowing false
+
+start
+:Richiesta o evento di dominio;
+if (Flusso di autorizzazione?) then (si)
+  :[[01_valutazione_is_allowed.puml ACT-01 is_allowed]];
+  :[[02_match_entry.puml ACT-02 match entry]];
+  :[[03_ereditarieta_multi_padre.puml ACT-03 ereditarieta]];
+elseif (Flusso liste?) then (si)
+  :[[04_candidate_resources.puml ACT-04 candidate_resources]];
+elseif (Flusso gestione ACL?) then (si)
+  :[[05_creazione_entry_acl.puml ACT-05 gestione entry]];
+  :[[09_grant_protetti.puml ACT-09 grant protetti]];
+elseif (Flusso lifecycle?) then (si)
+  :[[06_creazione_risorsa_seeding.puml ACT-06 seeding]];
+  :[[07_bootstrap_setup.puml ACT-07 bootstrap]];
+elseif (Flusso confine?) then (si)
+  :[[08_enforcement_boundary.puml ACT-08 richiesta normalizzata]];
+else (identita)
+  :[[10_risoluzione_profilo.puml ACT-10 profilo]];
+endif
+:Decisione, persistenza o errore applicativo;
+stop
+
+legend
+  Navigazione: [[../use%20case/00_mappa_use_case.puml Use case]] |
+  [[../componenti/00_mappa_componenti.puml Componenti]] |
+  [[../classi/00_modello_concettuale.puml Classi]]
+endlegend
+@enduml

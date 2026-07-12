@@ -1,0 +1,55 @@
+@startuml 02_gestire_entry_acl
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title UC-02 - Gestire entry ACL
+skinparam shadowing false
+
+actor "Amministratore ACL" as Admin
+actor "Caso d'uso\ndi dominio" as CasoDominio
+actor "Bootstrap" as Bootstrap
+
+rectangle "ACLService" {
+  usecase "Listare entry" as UCList
+  usecase "Creare entry" as UCCreate
+  usecase "Aggiornare entry" as UCUpdate
+  usecase "Eliminare entry" as UCDelete
+  usecase "Sostituire entry\natomiche per risorsa" as UCReplace
+  usecase "Cascade delete\nper risorsa/soggetto" as UCCascade
+  usecase "Hook lifecycle\non_resource_created" as UCHook
+  usecase "Validare INV-1..INV-7" as UCValidate
+  usecase "Richiedere\nMANAGE_ACL" as UCGate
+  usecase "Applicare\nGrantConstraintPolicy" as UCGrant
+}
+
+Admin --> UCList
+Admin --> UCCreate
+Admin --> UCUpdate
+Admin --> UCDelete
+Admin --> UCReplace
+CasoDominio --> UCCascade
+CasoDominio --> UCHook
+Bootstrap --> UCHook
+
+UCList ..> UCGate
+UCCreate ..> UCGate
+UCUpdate ..> UCGate
+UCDelete ..> UCGate
+UCReplace ..> UCGate
+UCCreate ..> UCValidate
+UCUpdate ..> UCValidate
+UCReplace ..> UCValidate
+UCValidate ..> UCGrant : se ALLOW protected
+
+note bottom of UCGate
+  Risorsa concreta: MANAGE_ACL sulla risorsa o SYSTEM:global.
+  SYSTEM:global e <TYPE>:*: sempre MANAGE_ACL globale.
+end note
+
+legend
+  Vedi anche: [[../attivit%C3%A0/05_creazione_entry_acl.puml ACT-05]] |
+  [[../classi/04_invarianti_grant.puml Invarianti]] |
+  [[../componenti/04_gestione_acl_bootstrap.puml Componenti gestione]]
+endlegend
+@enduml

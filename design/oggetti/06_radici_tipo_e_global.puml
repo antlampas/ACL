@@ -1,0 +1,63 @@
+@startuml 06_radici_tipo_e_global
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title OBJ-06 - SYSTEM:global, radici di tipo e MANAGE_ACL
+skinparam shadowing false
+
+object "systemGlobal : ResourceRef" as SystemGlobal {
+  type = SYSTEM
+  id = global
+}
+
+object "missionRoot : ResourceRef" as MissionRoot {
+  type = MISSION
+  id = *
+}
+
+object "mission5 : ResourceRef" as Mission5 {
+  type = MISSION
+  id = 5
+}
+
+object "globalManageAcl : ACLEntry" as GlobalManage {
+  resource = "SYSTEM:global"
+  operation = MANAGE_ACL
+  permission = ALLOW
+  level = 0
+}
+
+object "rootViewDefault : ACLEntry" as RootView {
+  resource = "MISSION:*"
+  operation = VIEW
+  permission = ALLOW
+  level = read_threshold
+}
+
+object "localManageAcl : ACLEntry" as LocalManage {
+  resource = "MISSION:5"
+  operation = MANAGE_ACL
+  permission = ALLOW
+  subject = "USER(delegate)"
+  level = ANON_SENTINEL
+}
+
+SystemGlobal <-- GlobalManage
+MissionRoot <-- RootView
+Mission5 --> MissionRoot : parents_of per VIEW
+Mission5 <-- LocalManage
+GlobalManage --> MissionRoot : richiesto per modificare radici
+GlobalManage --> SystemGlobal : richiesto per globale
+
+note right of LocalManage
+  MANAGE_ACL non e' ereditabile.
+  Una entry su MISSION:* non concede gestione ACL
+  automatica su MISSION:5.
+end note
+
+legend
+  Vedi anche: [[../classi/02_soggetti_risorse_operazioni.puml Classi risorse]] |
+  [[../attivit%C3%A0/05_creazione_entry_acl.puml Gestione entry]]
+endlegend
+@enduml

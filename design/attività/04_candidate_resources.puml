@@ -1,0 +1,39 @@
+@startuml 04_candidate_resources
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title ACT-04 - candidate_resources e filtro finale
+skinparam shadowing false
+
+start
+:Ricevi subject, operation, resource_type;
+:Risolvi profile e OperationSpec;
+:Repo.list_by_operation(operation, resource_type);
+:Prefiltra entry ALLOW matchanti per subject/profile;
+:Costruisci lista risorse candidate esplicite;
+if (Dominio ha liste gerarchiche?) then (si)
+  :Il dominio aggiunge figli di padri candidati;
+else (no)
+  :Usa solo candidate esplicite;
+endif
+:Per ogni risorsa candidata invoca is_allowed;
+if (is_allowed == ALLOWED?) then (si)
+  :Espone la risorsa al chiamante;
+else (no)
+  :Scarta la risorsa;
+endif
+:Restituisce lista autorizzata;
+stop
+
+note right
+  La pre-selezione non applica in modo definitivo DENY,
+  DENY ereditati da altri padri, entry proprie non
+  matchanti o ereditarieta completa.
+end note
+
+legend
+  Vedi anche: [[../use%20case/05_listare_risorse_candidate.puml UC-05]] |
+  [[../componenti/06_persistenza_performance.puml Persistenza]]
+endlegend
+@enduml

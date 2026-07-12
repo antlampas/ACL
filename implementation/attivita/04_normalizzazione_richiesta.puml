@@ -1,0 +1,43 @@
+@startuml impl_act_04_normalizzazione_richiesta
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title IMPL-ACT-04 - RequestNormalizer
+skinparam shadowing false
+
+start
+:Ricevi InvocationContext;
+:identity = IdentityResolver.resolve(context);
+:Trova RequestMappingRule tramite selector;
+if (Regola unica?) then (si)
+  :Risolvi operation;
+  if (resource_type assente?) then (si)
+    :resource = ResourceRef.system();
+  elseif (resource_id_source assente?) then (si)
+    :resource = ResourceRef.type_root(resource_type);
+  else (no)
+    :Risolvi id da sorgente affidabile;
+    :resource = ResourceRef(resource_type, id);
+  endif
+  if (Richiesta lista candidate?) then (si)
+    :Crea CandidateResourcesRequest;
+  else (no)
+    :Crea AuthorizationRequest;
+  endif
+  stop
+else (no)
+  if (Fallback conservativo configurato?) then (si)
+    :Crea richiesta protetta su SYSTEM:global;
+    stop
+  else (no)
+    :Solleva ResourceMappingError;
+    stop
+  endif
+endif
+
+legend
+  Vedi anche: [[../componenti/02_pipeline_richiesta.puml Pipeline]] |
+  [[../classi/03_ports_adapters.puml RequestNormalizer]]
+endlegend
+@enduml

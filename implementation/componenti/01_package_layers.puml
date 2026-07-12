@@ -1,0 +1,45 @@
+@startuml impl_cmp_01_package_layers
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title IMPL-CMP-01 - Package e dipendenze Python
+skinparam shadowing false
+skinparam componentStyle rectangle
+
+component "acl.adapters.requests" as ReqAdapters
+component "acl.adapters.identity" as IdentityAdapters
+component "acl.bootstrap" as Bootstrap
+component "acl.infrastructure" as Infra
+component "acl.application" as App
+component "acl.ports" as Ports
+component "acl.domain" as Domain
+
+ReqAdapters --> App
+ReqAdapters --> IdentityAdapters
+IdentityAdapters --> Ports
+Bootstrap --> App
+Bootstrap --> Infra
+Bootstrap --> Ports
+Infra ..|> Ports
+Infra --> Domain
+App --> Ports
+App --> Domain
+Ports --> Domain
+
+note bottom of Domain
+  Domain non importa mai application, ports,
+  infrastructure, adapters o config runtime.
+end note
+
+note right of Bootstrap
+  Composition root:
+  assembla implementazioni concrete
+  con dependency injection esplicita.
+end note
+
+legend
+  Vedi anche: [[../classi/01_domain_objects.puml Domain]] |
+  [[../classi/03_ports_adapters.puml Porte/adapter]]
+endlegend
+@enduml

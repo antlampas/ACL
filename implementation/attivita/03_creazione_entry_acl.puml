@@ -1,0 +1,34 @@
+@startuml impl_act_03_creazione_entry_acl
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title IMPL-ACT-03 - ACLService.create_entry
+skinparam shadowing false
+
+start
+:Ricevi RequestIdentity e ACLEntryInput;
+:operations.require(input.operation);
+:Applica default ergonomici;
+:Costruisci ACLEntry immutabile;
+if (Entry su SYSTEM:global o TYPE:*?) then (si)
+  :Richiedi MANAGE_ACL su SYSTEM:global;
+else (no)
+  :Richiedi MANAGE_ACL su risorsa o SYSTEM:global;
+endif
+:Valida INV-1..INV-5 strutturali;
+if (ALLOW su operation protected?) then (si)
+  :GrantConstraintPolicy.validate_grant;
+endif
+:Valida INV-6 e INV-7;
+:Apri UnitOfWork.transaction;
+:repository.save(entry);
+:Audit ACL_ENTRY_CREATED;
+:Commit;
+stop
+
+legend
+  Vedi anche: [[../use%20case/03_gestire_entry_acl.puml UC-03]] |
+  [[../classi/03_ports_adapters.puml Porte]]
+endlegend
+@enduml

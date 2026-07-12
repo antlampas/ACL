@@ -1,0 +1,49 @@
+@startuml impl_cmp_03_ports_infrastruttura
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title IMPL-CMP-03 - Porte e implementazioni infrastrutturali
+skinparam shadowing false
+skinparam componentStyle rectangle
+left to right direction
+
+package "Ports" as Ports {
+  interface "ACLEntryRepository" as RepoPort
+  interface "ProfileProvider" as ProfilePort
+  interface "ResourceHierarchyProvider" as HierarchyPort
+  interface "OperationCatalog" as OperationPort
+  interface "GrantConstraintPolicy" as GrantPort
+  interface "IdentityResolver" as IdentityPort
+  interface "AuditLogger" as AuditPort
+  interface "UnitOfWork" as UowPort
+}
+
+package "Infrastructure" as Infra {
+  component "SqlAlchemyACLEntryRepository" as SqlRepo
+  component "MemoryACLEntryRepository" as MemRepo
+  component "PersistedProfileProvider" as PersistedProfile
+  component "ClaimMappingProfileSource" as ClaimMapping
+  component "ConfiguredOperationCatalog" as ConfigCatalog
+  component "LoggingAuditLogger" as LoggingAudit
+  component "SqlUnitOfWork" as SqlUow
+}
+
+SqlRepo ..|> RepoPort
+MemRepo ..|> RepoPort
+PersistedProfile ..|> ProfilePort
+ClaimMapping --> PersistedProfile
+ConfigCatalog ..|> OperationPort
+LoggingAudit ..|> AuditPort
+SqlUow ..|> UowPort
+
+note bottom
+  Le implementazioni non cambiano le regole ACL:
+  espongono dataclass domain e rispettano le porte.
+end note
+
+legend
+  Vedi anche: [[../classi/03_ports_adapters.puml Classi porte]] |
+  [[04_persistenza_config_audit.puml Persistenza]]
+endlegend
+@enduml

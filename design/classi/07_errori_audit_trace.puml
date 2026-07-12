@@ -1,0 +1,60 @@
+@startuml 07_errori_audit_trace
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title CLS-07 - Errori, audit e DecisionTrace
+skinparam shadowing false
+hide empty members
+
+class DecisionTrace {
+  +subject : SubjectRef
+  +operation : OperationName
+  +resource : ResourceRef
+  +decision : Decision
+  +own_entries_found : bool
+  +matched_entries : list[ACLEntryId]
+  +visited_resources : list[ResourceRef]
+  +reason : str
+}
+
+abstract class ACLError
+class AuthenticationError
+class AuthorizationDenied
+class ACLValidationError
+class GrantConstraintError
+
+class AuditEvent <<Enum>> {
+  AUTHZ_DENIED
+  ACL_ENTRY_CREATED
+  ACL_ENTRY_UPDATED
+  ACL_ENTRY_DELETED
+  PROFILE_CHANGED
+  BOOTSTRAP_COMPLETED
+}
+
+class AuditRecord {
+  +event : AuditEvent
+  +actor : SubjectRef?
+  +resource : ResourceRef?
+  +operation : OperationName?
+  +trace : DecisionTrace?
+}
+
+ACLError <|-- AuthenticationError
+ACLError <|-- AuthorizationDenied
+ACLError <|-- ACLValidationError
+ACLError <|-- GrantConstraintError
+AuditRecord --> AuditEvent
+AuditRecord --> DecisionTrace
+
+note bottom of DecisionTrace
+  La trace e' utile per audit/debug amministrativo.
+  Non va esposta a soggetti finali non autorizzati.
+end note
+
+legend
+  Vedi anche: [[../use%20case/07_spiegare_decisione_audit.puml UC-07]] |
+  [[../componenti/07_errori_audit.puml CMP-07]]
+endlegend
+@enduml

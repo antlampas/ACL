@@ -1,0 +1,104 @@
+@startuml impl_cls_01_domain_objects
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title IMPL-CLS-01 - Domain value object e funzioni pure
+skinparam shadowing false
+hide empty members
+
+enum SubjectType {
+  USER
+  PUBLIC
+  SERVICE
+}
+
+enum Permission {
+  ALLOW
+  DENY
+}
+
+enum JoinOp {
+  AND
+  OR
+}
+
+enum Decision {
+  ALLOWED
+  DENIED
+}
+
+class SubjectRef <<dataclass>> {
+  +type: SubjectType
+  +id: str?
+  +public(): SubjectRef
+}
+
+class ResourceRef <<dataclass>> {
+  +type: str
+  +id: str
+  +system(): ResourceRef
+  +type_root(resource_type): ResourceRef
+  +is_system: bool
+  +is_type_root: bool
+}
+
+class OperationSpec <<dataclass>> {
+  +name: str
+  +read_only: bool
+  +inheritable: bool
+  +protected: bool
+}
+
+class Profile <<dataclass>> {
+  +level: int
+  +groups: frozenset[str]
+  +version: int?
+  +anonymous(): Profile
+  +stored_groups(): frozenset[str]
+}
+
+class ACLEntry <<dataclass>> {
+  +id: ACLEntryId
+  +subject: SubjectRef
+  +resource: ResourceRef
+  +operation: str
+  +permission: Permission
+  +level: int?
+  +group: str?
+  +profile_join: JoinOp
+  +subject_join: JoinOp
+}
+
+class EvaluationResult <<dataclass>> {
+  +decision: Decision
+  +explicit_deny: bool
+}
+
+class MatchingFunctions <<module>> {
+  +subject_matches(entry_subject, subject): bool
+  +profile_part_matches(entry, profile): bool
+  +entry_matches(entry, subject, profile): bool
+  +resolve(entries, subject, profile): EvaluationResult
+}
+
+ACLEntry --> SubjectRef
+ACLEntry --> ResourceRef
+ACLEntry --> Permission
+ACLEntry --> JoinOp
+SubjectRef --> SubjectType
+EvaluationResult --> Decision
+MatchingFunctions ..> ACLEntry
+MatchingFunctions ..> Profile
+MatchingFunctions ..> EvaluationResult
+
+note bottom of ACLEntry
+  INV-1 richiede almeno level o group.
+  INV-5 vieta PUBLIC con subject_join=OR.
+end note
+
+legend
+  Vedi anche: [[../attivita/02_policy_evaluate.puml ACT-02]] |
+  [[../oggetti/01_entry_view_public.puml Oggetto entry]]
+endlegend
+@enduml

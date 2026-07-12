@@ -1,0 +1,61 @@
+@startuml 00_mappa_use_case
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title UC-00 - Mappa casi d'uso del sistema ACL
+skinparam shadowing false
+skinparam packageStyle rectangle
+
+actor "Richiedente\nUSER / PUBLIC / SERVICE" as Richiedente
+actor "Amministratore ACL" as AdminACL
+actor "Amministratore profili" as AdminProfili
+actor "Bootstrap operator" as Bootstrap
+actor "Dominio consumatore" as Dominio
+actor "Request adapter" as Adapter
+
+rectangle "Sottosistema ACL" {
+  usecase "Autorizzare\noperazione" as UCAuth
+  usecase "Normalizzare richiesta\ne applicare gate" as UCGate
+  usecase "Gestire entry\nACL" as UCManage
+  usecase "Creare risorsa\ncon seeding" as UCSeed
+  usecase "Listare risorse\ncandidate" as UCCandidates
+  usecase "Gestire profili\ne grant protetti" as UCProfiles
+  usecase "Bootstrap e\nprimo admin" as UCBootstrap
+  usecase "Spiegare decisione\ne audit" as UCExplain
+}
+
+Richiedente --> UCAuth
+Adapter --> UCGate
+AdminACL --> UCManage
+Dominio --> UCSeed
+Dominio --> UCCandidates
+AdminProfili --> UCProfiles
+Bootstrap --> UCBootstrap
+AdminACL --> UCExplain
+
+UCGate ..> UCAuth : include
+UCManage ..> UCAuth : richiede MANAGE_ACL
+UCManage ..> UCProfiles : grant protected
+UCSeed ..> UCManage : materializza entry
+UCCandidates ..> UCAuth : filtro finale
+UCBootstrap ..> UCManage : semina iniziale
+UCExplain ..> UCAuth : usa trace
+
+note right of UCAuth
+  Dettagli: [[01_autorizzare_operazione.puml UC-01]]
+end note
+note right of UCManage
+  Dettagli: [[02_gestire_entry_acl.puml UC-02]]
+end note
+note bottom of UCSeed
+  Dettagli: [[04_creare_risorsa_con_seeding.puml UC-04]]
+end note
+
+legend
+  Navigazione: [[../componenti/00_mappa_componenti.puml Componenti]] |
+  [[../attivit%C3%A0/00_mappa_attivita.puml Attivita]] |
+  [[../classi/00_modello_concettuale.puml Classi]] |
+  [[../oggetti/00_mappa_oggetti.puml Oggetti]]
+endlegend
+@enduml

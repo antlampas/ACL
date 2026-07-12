@@ -1,0 +1,65 @@
+@startuml 05_policy_services_ports
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title CLS-05 - Policy, service, porte e richieste
+skinparam shadowing false
+hide empty members
+
+class AuthorizationPolicy {
+  +is_allowed(subject, operation, resource) : Decision
+  +candidate_resources(subject, operation, resource_type) : list[ResourceRef]
+  +explain(subject, operation, resource) : DecisionTrace
+}
+
+class AuthorizationService {
+  +is_allowed(request) : bool
+  +require(request) : void
+  +candidate_resources(request) : list[ResourceRef]
+  +explain(request) : DecisionTrace
+}
+
+class ACLService {
+  +list_entries(identity, resource)
+  +create_entry(identity, input)
+  +update_entry(identity, entry_id, changes)
+  +delete_entry(identity, entry_id)
+  +replace_entries(identity, resource, inputs)
+  +delete_by_resource(resource)
+  +delete_by_subject(subject)
+  +on_resource_created(resource, creator, resource_type)
+  +ensure_bootstrap_entries()
+}
+
+interface ACLEntryRepository
+interface IdentityResolver
+interface RequestNormalizer
+interface ProfileProvider
+interface ResourceHierarchyProvider
+interface OperationCatalog
+interface GrantConstraintPolicy
+interface PrincipalBindingPort
+
+AuthorizationService --> AuthorizationPolicy
+AuthorizationService --> IdentityResolver
+RequestNormalizer ..> AuthorizationService : produce request
+ACLService --> AuthorizationPolicy
+ACLService --> ACLEntryRepository
+ACLService --> GrantConstraintPolicy
+AuthorizationPolicy --> ACLEntryRepository
+AuthorizationPolicy --> ProfileProvider
+AuthorizationPolicy --> ResourceHierarchyProvider
+AuthorizationPolicy --> OperationCatalog
+IdentityResolver --> PrincipalBindingPort
+
+note bottom of AuthorizationService
+  Riceve richieste normalizzate.
+  Traduce identity in subject e Decision in bool/errore.
+end note
+
+legend
+  Vedi anche: [[../componenti/00_mappa_componenti.puml CMP-00]] |
+  [[../attivit%C3%A0/01_valutazione_is_allowed.puml ACT-01]]
+endlegend
+@enduml

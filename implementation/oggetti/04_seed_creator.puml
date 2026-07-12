@@ -1,0 +1,53 @@
+@startuml impl_obj_04_seed_creator
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title IMPL-OBJ-04 - Seeding del creator
+skinparam shadowing false
+
+object "seedRule: SeedRule" as Rule {
+  resource_type = DOCUMENT
+  operations = {VIEW, EDIT, DELETE, MANAGE_ACL}
+  grant_to = CREATOR
+  level_strategy = UNIVERSAL
+}
+
+object "creator: SubjectRef" as Creator {
+  type = USER
+  id = alice
+}
+
+object "resource: ResourceRef" as Resource {
+  type = DOCUMENT
+  id = doc-42
+}
+
+object "seededEntry: ACLEntry" as Entry {
+  subject = USER(alice)
+  resource = DOCUMENT:doc-42
+  operation = MANAGE_ACL
+  permission = ALLOW
+  level = ANON_SENTINEL
+  subject_join = AND
+}
+
+object "uow: UnitOfWork" as Uow {
+  transaction = active
+}
+
+Rule --> Entry
+Creator --> Entry
+Resource --> Entry
+Uow --> Entry : save in transaction
+
+note bottom of Entry
+  Entry ordinaria: revocabile,
+  auditabile e soggetta a DENY.
+end note
+
+legend
+  Vedi anche: [[../attivita/05_bootstrap_seeding.puml ACT-05]] |
+  [[../use%20case/04_bootstrap_seeding.puml UC-04]]
+endlegend
+@enduml

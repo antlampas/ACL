@@ -1,0 +1,61 @@
+@startuml 02_mutazione_gruppo_editors
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title OBJ-02 - PUBLIC come assenza di vincolo identitario, gruppo editors
+skinparam shadowing false
+
+object "entryEditorsEdit : ACLEntry" as Entry {
+  subject = PUBLIC
+  resource = "DOC:123"
+  operation = EDIT
+  permission = ALLOW
+  group = editors
+  subject_join = AND
+}
+
+object "bob : SubjectRef" as Bob {
+  kind = USER
+  id = bob
+}
+
+object "bobProfile : Profile" as BobProfile {
+  level = 60
+  groups = {"public", "editors"}
+}
+
+object "anonymousProfile : Profile" as AnonymousProfile {
+  level = ANON_SENTINEL
+  groups = {"public"}
+}
+
+object "editSpec : OperationSpec" as EditSpec {
+  name = EDIT
+  read_only = false
+  inheritable = true
+  protected = false
+}
+
+object "decisionBob : Decision" as DecisionBob {
+  value = ALLOWED
+}
+
+object "decisionAnon : Decision" as DecisionAnon {
+  value = DENIED
+  reason = "group editors assente, INV-2 preservata"
+}
+
+Entry --> Bob : subjectMatch per PUBLIC
+Entry --> BobProfile : groupMatch
+Entry --> DecisionBob
+Entry --> AnonymousProfile : no groupMatch
+Entry --> DecisionAnon
+Entry --> EditSpec
+
+legend
+  Vedi anche: [[../classi/01_acl_entry.puml ACLEntry]] |
+  [[../attivit%C3%A0/09_grant_protetti.puml Grant protetti]] |
+  [[00_mappa_oggetti.puml Indice oggetti]]
+endlegend
+@enduml

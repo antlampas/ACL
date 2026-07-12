@@ -1,0 +1,42 @@
+@startuml 08_enforcement_boundary
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title ACT-08 - Enforcement su richiesta normalizzata
+skinparam shadowing false
+
+start
+:Ricevi InvocationContext da qualunque origine;
+:IdentityResolver produce RequestIdentity;
+:RequestNormalizer determina operation e resource;
+if (Richiesta mappabile?) then (si)
+  :Costruisci AuthorizationRequest;
+else (no)
+  :Fallisci chiuso o applica fallback conservativo;
+  :Mappa errore nell'esito esterno del chiamante;
+  stop
+endif
+if (Richiesta di gestione ACL?) then (si)
+  :Invoca ACLService;
+else (no)
+  :Invoca AuthorizationService.require(request);
+endif
+if (Autorizzato?) then (si)
+  :Esegue caso d'uso applicativo;
+  stop
+else (no)
+  if (Identita assente o non valida?) then (si)
+    :Segnala richiesta di identita valida;
+  else (no)
+    :Segnala diniego senza trace sensibili;
+  endif
+  :Registra evento AUTHZ_DENIED se opportuno;
+  stop
+endif
+
+legend
+  Vedi anche: [[../use%20case/08_enforcement_richieste.puml UC-08]] |
+  [[../componenti/03_normalizzazione_richieste.puml Componenti richieste]]
+endlegend
+@enduml

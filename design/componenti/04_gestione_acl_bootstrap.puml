@@ -1,0 +1,41 @@
+@startuml 04_gestione_acl_bootstrap
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title CMP-04 - Gestione ACL, bootstrap e seeding
+skinparam shadowing false
+skinparam componentStyle rectangle
+
+component "ACLService" as AclService
+component "AuthorizationPolicy" as Policy
+component "ACLEntryInvariants" as Invariants
+component "GrantConstraintPolicy" as GrantPolicy
+component "SeedingPolicy" as SeedingPolicy
+component "BootstrapService" as BootstrapService
+database "ACLEntryRepository" as Repo
+
+component "Domain use case" as DomainUseCase
+component "Profile administration" as ProfileAdmin
+
+AclService --> Policy : verifica MANAGE_ACL
+AclService --> Invariants : INV-1..INV-7
+AclService --> GrantPolicy : ALLOW protected
+AclService --> Repo : CRUD/replace/cascade
+DomainUseCase --> AclService : on_resource_created,\ndelete_by_resource
+AclService --> SeedingPolicy : entry iniziali
+BootstrapService --> AclService : ensure_bootstrap_entries
+ProfileAdmin --> Policy : richiede MANAGE_PROFILES
+
+note right of BootstrapService
+  Bootstrap crea entry ordinarie:
+  SYSTEM:global per privilegi globali,
+  <TYPE>:* per default di categoria.
+end note
+
+legend
+  Vedi anche: [[../use%20case/02_gestire_entry_acl.puml UC-02]] |
+  [[../use%20case/03_bootstrap_primo_admin.puml UC-03]] |
+  [[../attivit%C3%A0/06_creazione_risorsa_seeding.puml ACT-06]]
+endlegend
+@enduml

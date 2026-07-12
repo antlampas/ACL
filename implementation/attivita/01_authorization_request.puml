@@ -1,0 +1,30 @@
+@startuml impl_act_01_authorization_request
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title IMPL-ACT-01 - AuthorizationService.require
+skinparam shadowing false
+
+start
+:Ricevi AuthorizationRequest;
+:Estrai RequestIdentity;
+:subject = request.identity.subject;
+:operation = request.operation;
+:resource = request.resource;
+:Invoca AuthorizationPolicy.is_allowed(subject, operation, resource);
+if (Decision == ALLOWED?) then (si)
+  :Restituisci successo;
+  stop
+else (no)
+  :Crea AuthorizationDenied;
+  :Registra AUTHZ_DENIED se AuditLogger configurato;
+  :Propaga errore al confine;
+  stop
+endif
+
+legend
+  Vedi anche: [[02_policy_evaluate.puml ACT-02]] |
+  [[../classi/02_policy_service_dto.puml Service/DTO]]
+endlegend
+@enduml

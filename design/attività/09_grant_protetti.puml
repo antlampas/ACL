@@ -1,0 +1,39 @@
+@startuml 09_grant_protetti
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title ACT-09 - Grant protetti e prevenzione escalation
+skinparam shadowing false
+
+start
+:ACLService riceve entry da creare o aggiornare;
+if (permission == ALLOW?) then (si)
+  :Risolvi OperationSpec;
+  if (operation.protected?) then (si)
+    :Invoca GrantConstraintPolicy;
+    if (Chiamante puo concedere questa operazione?) then (si)
+      if (Soglia/gruppo non supera limiti del chiamante?) then (si)
+        :Grant consentito;
+      else (no)
+        :Rifiuta soglia piu privilegiata;
+        stop
+      endif
+    else (no)
+      :Rifiuta operazione protected;
+      stop
+    endif
+  else (no)
+    :Grant non protected;
+  endif
+else (DENY)
+  :DENY non concede privilegi ma resta soggetto a invarianti;
+endif
+:Persiste se INV-1..INV-7 valide;
+stop
+
+legend
+  Vedi anche: [[../use%20case/06_gestire_profili_grant_protetti.puml UC-06]] |
+  [[../classi/04_invarianti_grant.puml Invarianti e grant]]
+endlegend
+@enduml

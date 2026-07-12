@@ -1,0 +1,56 @@
+@startuml impl_obj_03_multi_parent_deny
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title IMPL-OBJ-03 - Multi-padre con DENY bloccante
+skinparam shadowing false
+
+object "resource: ResourceRef" as Resource {
+  type = DOCUMENT
+  id = doc-42
+}
+
+object "parentA: ResourceRef" as ParentA {
+  type = COLLECTION
+  id = col-1
+}
+
+object "parentB: ResourceRef" as ParentB {
+  type = PROJECT
+  id = prj-9
+}
+
+object "denyEntry: ACLEntry" as DenyEntry {
+  resource = COLLECTION:col-1
+  operation = VIEW
+  permission = DENY
+  subject = USER(alice)
+  level = ANON_SENTINEL
+}
+
+object "allowEntry: ACLEntry" as AllowEntry {
+  resource = PROJECT:prj-9
+  operation = VIEW
+  permission = ALLOW
+  subject = USER(alice)
+  level = ANON_SENTINEL
+}
+
+object "final: EvaluationResult" as Final {
+  decision = DENIED
+  explicit_deny = true
+}
+
+Resource --> ParentA : parents_of
+Resource --> ParentB : parents_of
+ParentA --> DenyEntry
+ParentB --> AllowEntry
+DenyEntry --> Final : blocca
+AllowEntry --> Final : non prevale
+
+legend
+  Vedi anche: [[../attivita/02_policy_evaluate.puml ACT-02]] |
+  [[../classi/02_policy_service_dto.puml Policy]]
+endlegend
+@enduml

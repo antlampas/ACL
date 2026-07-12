@@ -1,0 +1,57 @@
+@startuml 02_policy_ports_interni
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title CMP-02 - AuthorizationPolicy e porte necessarie
+skinparam shadowing false
+skinparam componentStyle rectangle
+left to right direction
+
+component "AuthorizationPolicy" as Policy {
+  [is_allowed]
+  [candidate_resources]
+  [explain]
+}
+
+package "Porte consultate" as Ports {
+  component "ACLEntryRepository\nentries_for\nlist_by_operation" as Repo
+  component "ProfileProvider\nprofile(subject)" as ProfileProvider
+  component "OperationCatalog\nspec(operation)" as Catalog
+  component "ResourceHierarchyProvider\nparents_of(resource)" as Hierarchy
+}
+
+component "Domain functions" as DomainFns {
+  [subject_matches]
+  [profile_part_matches]
+  [entry_matches]
+  [resolve]
+}
+
+Policy --> Ports
+Policy --> DomainFns
+
+Repo -[hidden]down- ProfileProvider
+ProfileProvider -[hidden]down- Catalog
+Catalog -[hidden]down- Hierarchy
+
+note bottom of Policy
+  L'algoritmo usa:
+  1. OperationSpec
+  2. Profile
+  3. entry proprie
+  4. padri solo se inheritable
+  5. guardia anti-ciclo
+  6. DENY parentale blocca ALLOW sibling
+end note
+
+note bottom of Ports
+  Le operazioni sono nel corpo dei nodi per evitare
+  etichette sugli archi e mantenere leggibile il layout.
+end note
+
+legend
+  Vedi anche: [[../attivit%C3%A0/01_valutazione_is_allowed.puml ACT-01]] |
+  [[../attivit%C3%A0/03_ereditarieta_multi_padre.puml ACT-03]]
+endlegend
+@enduml

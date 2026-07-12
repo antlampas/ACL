@@ -1,0 +1,40 @@
+@startuml 01_dipendenze_layer
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title CMP-01 - Direzione delle dipendenze
+skinparam shadowing false
+
+component "request adapters" as Adapters
+component "RequestNormalizer" as RequestNormalizer
+component "AuthorizationService" as AuthService
+component "ACLService" as AclService
+component "AuthorizationPolicy" as Policy
+component "Ports" as Ports
+component "Domain" as Domain
+component "Adapter implementations" as AdapterImpl
+
+Adapters --> RequestNormalizer
+RequestNormalizer --> AuthService
+Adapters --> AclService
+AuthService --> Policy
+AclService --> Policy
+AclService --> Ports
+AclService --> Domain
+Policy --> Ports
+Policy --> Domain
+Ports --> Domain
+AdapterImpl ..|> Ports : implementa
+AdapterImpl --> Domain
+
+note bottom of Domain
+  Il domain contiene value object, enum e funzioni pure.
+  Non importa framework, repository, sessioni o database.
+end note
+
+legend
+  Vedi anche: [[00_mappa_componenti.puml CMP-00]] |
+  [[../classi/05_policy_services_ports.puml Classi servizi/porte]]
+endlegend
+@enduml

@@ -1,0 +1,52 @@
+@startuml 02_match_entry
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title ACT-02 - Match di una ACLEntry
+skinparam shadowing false
+
+start
+:Ricevi entry, subject effettivo e profile;
+if (entry.subject == PUBLIC?) then (si)
+  :subjectMatch = true;
+else (no)
+  if (entry.subject == subject?) then (si)
+    :subjectMatch = true;
+  else (no)
+    :subjectMatch = false;
+  endif
+endif
+
+if (entry.level presente?) then (si)
+  :levelMatch = profile.level <= entry.level;
+else (no)
+  :levelMatch = assente;
+endif
+
+if (entry.group presente?) then (si)
+  :groupMatch = entry.group in profile.groups;
+else (no)
+  :groupMatch = assente;
+endif
+
+:Combina solo criteri presenti con profile_join;
+if (entry.subject_join == AND?) then (si)
+  :matches = subjectMatch AND profilePart;
+else (OR)
+  :matches = subjectMatch OR profilePart;
+endif
+
+if (matches?) then (si)
+  :Entry matchante;
+else (no)
+  :Entry non matchante;
+endif
+stop
+
+legend
+  Vincoli: INV-1 garantisce almeno level o group. INV-5 vieta PUBLIC con subject_join OR.
+  Vedi anche: [[../classi/01_acl_entry.puml ACLEntry]] |
+  [[../oggetti/02_mutazione_gruppo_editors.puml Oggetto editors]]
+endlegend
+@enduml

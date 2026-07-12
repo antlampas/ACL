@@ -1,0 +1,34 @@
+@startuml 06_persistenza_performance
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title CMP-06 - Persistenza, liste candidate e performance
+skinparam shadowing false
+
+component "AuthorizationPolicy.candidate_resources" as Candidate
+interface "ACLEntryRepository" as Repo
+database "ACL storage" as Storage
+component "Domain query service" as DomainQuery
+component "Final is_allowed filter" as FinalFilter
+component "Request scoped cache" as Cache
+
+Candidate --> Repo : list_by_operation(operation, type)
+Repo --> Storage : indici su resource,\noperation, subject
+Candidate --> Cache : entry padri per richiesta
+Candidate --> DomainQuery : figli di padri candidati
+DomainQuery --> FinalFilter
+Candidate --> FinalFilter
+FinalFilter --> Repo : entries_for batch
+
+note right of Candidate
+  Restituisce una pre-selezione.
+  Ogni risorsa esposta al chiamante passa da is_allowed,
+  che blocca anche DENY ereditati da altri padri.
+end note
+
+legend
+  Vedi anche: [[../use%20case/05_listare_risorse_candidate.puml UC-05]] |
+  [[../attivit%C3%A0/04_candidate_resources.puml ACT-04]]
+endlegend
+@enduml

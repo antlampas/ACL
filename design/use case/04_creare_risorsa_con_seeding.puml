@@ -1,0 +1,44 @@
+@startuml 04_creare_risorsa_con_seeding
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title UC-04 - Creare una risorsa con seeding ACL
+skinparam shadowing false
+
+actor "Creatore" as Creator
+actor "Caso d'uso\ndi dominio" as DomainUseCase
+actor "ACLService" as ACLService
+actor "SeedingPolicy" as SeedingPolicy
+
+rectangle "Creazione risorsa" {
+  usecase "Autorizzare CREATE\nsu SYSTEM:global o padre" as UCCreateAuth
+  usecase "Persistire risorsa\nnel dominio" as UCPersist
+  usecase "Applicare\non_resource_created" as UCHook
+  usecase "Calcolare entry\niniziali" as UCEntries
+  usecase "Persistire entry\nnella stessa transazione" as UCCommit
+  usecase "Compensare se\ntransazione condivisa assente" as UCCompensate
+}
+
+Creator --> DomainUseCase
+DomainUseCase --> UCCreateAuth
+UCCreateAuth ..> UCPersist
+UCPersist --> ACLService
+ACLService --> UCHook
+UCHook --> SeedingPolicy
+SeedingPolicy --> UCEntries
+UCEntries ..> UCCommit
+UCEntries ..> UCCompensate
+
+note bottom of UCEntries
+  Default creatore:
+  ALLOW operation USER(creator) level=ANON_SENTINEL.
+  Le entry sono revocabili e soggette a DENY.
+end note
+
+legend
+  Vedi anche: [[../attivit%C3%A0/06_creazione_risorsa_seeding.puml ACT-06]] |
+  [[../classi/06_bootstrap_seeding.puml Classi seeding]] |
+  [[../oggetti/07_seeding_creator.puml Oggetto seeding]]
+endlegend
+@enduml

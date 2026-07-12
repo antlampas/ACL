@@ -1,0 +1,51 @@
+@startuml 01_lettura_pubblica
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title OBJ-01 - Lettura pubblica read-only
+skinparam shadowing false
+
+object "entryPublicView : ACLEntry" as Entry {
+  subject = PUBLIC
+  resource = "PHOTO:*"
+  operation = VIEW
+  permission = ALLOW
+  group = public
+  level = null
+  profile_join = OR
+  subject_join = AND
+}
+
+object "anonymous : SubjectRef" as Subject {
+  kind = PUBLIC
+}
+
+object "anonProfile : Profile" as Profile {
+  level = ANON_SENTINEL
+  groups = {"public"}
+}
+
+object "viewSpec : OperationSpec" as Operation {
+  name = VIEW
+  read_only = true
+  inheritable = true
+  protected = false
+}
+
+object "decision : Decision" as Decision {
+  value = ALLOWED
+  reason = "PUBLIC + group public + read_only"
+}
+
+Entry --> Subject : subjectMatch
+Entry --> Profile : groupMatch
+Entry --> Operation : INV-2 ok
+Entry --> Decision
+
+legend
+  Vedi anche: [[../attivit%C3%A0/02_match_entry.puml ACT-02]] |
+  [[02_mutazione_gruppo_editors.puml Mutazione editors]] |
+  [[00_mappa_oggetti.puml Indice oggetti]]
+endlegend
+@enduml

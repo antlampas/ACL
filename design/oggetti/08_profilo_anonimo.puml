@@ -1,0 +1,55 @@
+@startuml 08_profilo_anonimo
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam nodesep 80
+skinparam ranksep 80
+title OBJ-08 - Profilo anonimo come valore ordinario
+skinparam shadowing false
+
+object "missingIdentity : RequestIdentity" as MissingIdentity {
+  authenticated = false
+}
+
+object "anonymousSubject : SubjectRef" as AnonymousSubject {
+  kind = PUBLIC
+}
+
+object "anonymousProfile : Profile" as AnonymousProfile {
+  level = ANON_SENTINEL
+  groups = {"public"}
+}
+
+object "publicReadEntry : ACLEntry" as ReadEntry {
+  subject = PUBLIC
+  operation = VIEW
+  permission = ALLOW
+  group = public
+}
+
+object "publicMutatingEntry : ACLEntry" as MutatingEntry {
+  subject = PUBLIC
+  operation = EDIT
+  permission = ALLOW
+  group = public
+}
+
+object "readDecision : Decision" as ReadDecision {
+  value = ALLOWED
+}
+
+object "editValidation : ACLValidationError" as EditValidation {
+  reason = "INV-2: mutazione soddisfacibile dall'anonimo"
+}
+
+MissingIdentity --> AnonymousSubject
+AnonymousSubject --> AnonymousProfile
+ReadEntry --> AnonymousProfile
+ReadEntry --> ReadDecision
+MutatingEntry --> AnonymousProfile
+MutatingEntry --> EditValidation
+
+legend
+  Vedi anche: [[../attivit%C3%A0/10_risoluzione_profilo.puml ACT-10]] |
+  [[01_lettura_pubblica.puml Lettura pubblica]]
+endlegend
+@enduml
