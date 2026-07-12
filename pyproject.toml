@@ -1,0 +1,37 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+
+[build-system]
+requires = ["hatchling>=1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "acl-subsystem"
+version = "0.1.0"
+description = "Reusable declarative ACL subsystem"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { file = "LICENSE.md" }
+authors = [
+  { name = "Francesco" },
+]
+dependencies = []
+
+[project.optional-dependencies]
+sql = [
+  "SQLAlchemy>=2.0",
+  "alembic>=1.13",
+]
+config = [
+  "PyYAML>=6.0",
+]
+dev = [
+  "pytest>=8.0",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/acl"]
