@@ -18,23 +18,22 @@ application, infrastructure, adapters e bootstrap.
 
 ## Stato del progetto
 
-Il checkout e' attualmente documentale: non contiene ancora codice di produzione,
-suite di test o comandi di build. I file presenti definiscono architettura,
-invarianti, confini degli adapter, casi d'uso e diagrammi PlantUML di supporto.
-
-Quando verra' aggiunta un'implementazione, la struttura raccomandata e':
+Il checkout contiene la specifica progettuale, la specifica implementativa, i
+diagrammi PlantUML di supporto, una prima implementazione Python e una suite di
+test. La struttura corrente e':
 
 ```text
-src/        codice di produzione
-tests/      test automatici
-docs/       note progettuali di supporto
+src/             codice di produzione
+tests/           test automatici
+design/          specifica progettuale e diagrammi
+implementation/  specifica implementativa e diagrammi
 ```
 
 Il package ACL a layer descritto in
 [implementation/IMPLEMENTATION.md](implementation/IMPLEMENTATION.md) (§3) vive
-dentro `src/` come `src/acl/`: `src/`/`tests/`/`docs/` è la vista di repository, la
-suddivisione a layer (`domain`, `ports`, `application`, `infrastructure`,
-`adapters`, `bootstrap`) è la struttura interna autorevole del package.
+direttamente sotto `src/`: i package top-level `domain`, `ports`,
+`application`, `infrastructure`, `adapters` e `bootstrap` sono la struttura
+interna autorevole del sottosistema.
 
 ## Struttura
 
@@ -49,6 +48,7 @@ suddivisione a layer (`domain`, `ports`, `application`, `infrastructure`,
   pipeline, oggetti, attivita, componenti e mapping di persistenza.
 - [AGENTS.md](AGENTS.md): linee guida operative locali per manutenzione, stile,
   controlli e sicurezza.
+- [CLAUDE.md](CLAUDE.md): linee guida equivalenti per Claude Code.
 
 Mappe principali:
 
@@ -69,12 +69,15 @@ Mappe principali:
 
 ## Controlli consigliati
 
-In assenza di una suite di test, usare controlli leggeri sulla documentazione:
+Prima di inviare modifiche, eseguire la suite e i controlli leggeri sulla
+documentazione:
 
 ```sh
+python -m compileall -q src tests
+python -m pytest
 rg -n "INV-|D[0-9]" design/DESIGN.md
 find design implementation -name '*.puml' -print
-markdownlint README.md design/DESIGN.md implementation/IMPLEMENTATION.md AGENTS.md
+markdownlint README.md design/DESIGN.md implementation/IMPLEMENTATION.md AGENTS.md CLAUDE.md
 git diff --check
 ```
 

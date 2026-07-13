@@ -4,13 +4,13 @@ from __future__ import annotations
 
 import pytest
 
-from acl.adapters.identity import ContextIdentityResolver
-from acl.adapters.requests import InvocationContext, MappingRequestNormalizer, RequestMappingRule
-from acl.application import BootstrapACLConfig, BootstrapService, InitialAdminInput
-from acl.domain import ACLEntryId, Permission, Profile, ResourceMappingError, ResourceRef, SubjectRef
-from acl.infrastructure.operations import default_operation_catalog
-from acl.infrastructure.persistence import InMemoryACLEntryRepository
-from acl.infrastructure.profiles import InMemoryProfileProvider
+from adapters.identity import ContextIdentityResolver
+from adapters.requests import InvocationContext, MappingRequestNormalizer, RequestMappingRule
+from application import BootstrapACLConfig, BootstrapService, InitialAdminInput
+from domain import ACLEntryId, Permission, Profile, ResourceMappingError, ResourceRef, SubjectRef
+from infrastructure.operations import default_operation_catalog
+from infrastructure.persistence import InMemoryACLEntryRepository
+from infrastructure.profiles import InMemoryProfileProvider
 from tests.conftest import acl_entry
 
 

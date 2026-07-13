@@ -6,12 +6,12 @@ from collections.abc import Mapping, Sequence
 
 import pytest
 
-from acl.application import AuthorizationPolicy
-from acl.domain import ACLEntry, ACLEntryId, Permission, Profile, ResourceRef, SubjectRef
-from acl.infrastructure.operations import default_operation_catalog
-from acl.infrastructure.persistence import InMemoryACLEntryRepository
-from acl.infrastructure.profiles import InMemoryProfileProvider
-from acl.infrastructure.resources import StaticResourceHierarchyProvider
+from application import AuthorizationPolicy
+from domain import ACLEntry, ACLEntryId, Permission, Profile, ResourceRef, SubjectRef
+from infrastructure.operations import default_operation_catalog
+from infrastructure.persistence import InMemoryACLEntryRepository
+from infrastructure.profiles import InMemoryProfileProvider
+from infrastructure.resources import StaticResourceHierarchyProvider
 
 
 @pytest.fixture

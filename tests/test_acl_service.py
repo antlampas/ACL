@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import pytest
 
-from acl.application import ACLEntryInput, ACLService, AuthorizationPolicy, SeedRule, SeedingPolicy
-from acl.domain import (
+from application import ACLEntryInput, ACLService, AuthorizationPolicy, SeedRule, SeedingPolicy
+from domain import (
     ACLEntryId,
     ACLValidationError,
     GrantConstraintError,
@@ -14,11 +14,11 @@ from acl.domain import (
     ResourceRef,
     SubjectRef,
 )
-from acl.infrastructure.operations import default_operation_catalog
-from acl.infrastructure.persistence import InMemoryACLEntryRepository
-from acl.infrastructure.profiles import InMemoryProfileProvider
-from acl.infrastructure.resources import StaticResourceHierarchyProvider
-from acl.ports import RequestIdentity
+from infrastructure.operations import default_operation_catalog
+from infrastructure.persistence import InMemoryACLEntryRepository
+from infrastructure.profiles import InMemoryProfileProvider
+from infrastructure.resources import StaticResourceHierarchyProvider
+from ports import RequestIdentity
 from tests.conftest import acl_entry
 
 

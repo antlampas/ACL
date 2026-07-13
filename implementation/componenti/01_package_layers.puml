@@ -13,13 +13,13 @@ title IMPL-CMP-01 - Package e dipendenze Python
 skinparam shadowing false
 skinparam componentStyle rectangle
 
-component "acl.adapters.requests" as ReqAdapters
-component "acl.adapters.identity" as IdentityAdapters
-component "acl.bootstrap" as Bootstrap
-component "acl.infrastructure" as Infra
-component "acl.application" as App
-component "acl.ports" as Ports
-component "acl.domain" as Domain
+component "adapters.requests" as ReqAdapters
+component "adapters.identity" as IdentityAdapters
+component "bootstrap" as Bootstrap
+component "infrastructure" as Infra
+component "application" as App
+component "ports" as Ports
+component "domain" as Domain
 
 ReqAdapters --> App
 ReqAdapters --> IdentityAdapters

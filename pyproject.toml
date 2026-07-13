@@ -34,4 +34,11 @@ testpaths = ["tests"]
 addopts = "-q"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/acl"]
+packages = [
+  "src/adapters",
+  "src/application",
+  "src/bootstrap",
+  "src/domain",
+  "src/infrastructure",
+  "src/ports",
+]

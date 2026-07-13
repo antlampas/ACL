@@ -64,10 +64,11 @@ design.
 
 ## 3. Struttura del package
 
-Layout raccomandato:
+Layout corrente:
 
 ```text
-acl/
+src/
+  __init__.py
   domain/
     __init__.py
     identifiers.py
@@ -97,29 +98,43 @@ acl/
     acl_service.py
     bootstrap_service.py
     dto.py
-    mappers.py
   infrastructure/
+    __init__.py
+    grants.py
     persistence/
+      __init__.py
       sqlalchemy.py
       memory.py
       file_json.py
+      serialization.py
     profiles/
+      __init__.py
       persisted.py
-      claim_mapping.py
+    resources/
+      __init__.py
+      static.py
+    operations/
+      __init__.py
+      static.py
     config/
+      __init__.py
       settings.py
       loader.py
     audit/
+      __init__.py
       logging.py
   adapters/
+    __init__.py
     requests/
+      __init__.py
       context.py
       normalizer.py
       denied_mapper.py
     identity/
+      __init__.py
       resolver.py
-      credentials.py
   bootstrap/
+    __init__.py
     container.py
     factory.py
 ```
@@ -135,14 +150,15 @@ Regole:
 - `bootstrap` assembla le dipendenze con dependency injection esplicita.
 
 Il package puo essere pubblicato come libreria autonoma. Gli adapter specifici
-vanno dichiarati come extra opzionali, per esempio `acl[sql]`, `acl[redis]`,
-`acl[identity]`, `acl[audit]`, `acl[test]`.
+vanno dichiarati come extra opzionali della distribuzione, per esempio
+`acl-subsystem[sql]`, `acl-subsystem[redis]`, `acl-subsystem[identity]`,
+`acl-subsystem[audit]`, `acl-subsystem[test]`.
 
-Raccordo con il layout di repository: `acl/` è la **struttura interna autorevole a
-layer** del package. In un checkout, `AGENTS.md` e `README.md` raccomandano
-`src/`, `tests/`, `docs/`; le due viste non sono in conflitto: il package vive in
-`src/acl/`, i test in `tests/` e le note di supporto in `docs/`. La suddivisione a
-layer di questa sezione prevale sulla granularità generica `src/`.
+Raccordo con il layout di repository: `src/` è la radice del codice di
+produzione. I package top-level `domain`, `ports`, `application`,
+`infrastructure`, `adapters` e `bootstrap` sono la **struttura interna autorevole
+a layer**; i test vivono in `tests/` e le note di supporto in `docs/` quando
+presenti.
 
 ---
 

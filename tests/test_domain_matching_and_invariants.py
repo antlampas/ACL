@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from acl.domain import (
+from domain import (
     ACLEntry,
     ACLEntryId,
     ACLEntryInvariants,
@@ -18,7 +18,7 @@ from acl.domain import (
     entry_matches,
     resolve,
 )
-from acl.infrastructure.operations import default_operation_catalog
+from infrastructure.operations import default_operation_catalog
 
 
 def test_profile_always_contains_public_group() -> None:

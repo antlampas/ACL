@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from acl.domain import Decision, Permission, Profile, ResourceRef, SubjectRef
+from domain import Decision, Permission, Profile, ResourceRef, SubjectRef
 from tests.conftest import acl_entry, make_policy
 
 
