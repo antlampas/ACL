@@ -9,7 +9,7 @@
 skinparam backgroundColor white
 skinparam nodesep 80
 skinparam ranksep 80
-title UC-01 - Autorizzare una operazione
+title UC-01 - Autorizzare un'operazione
 skinparam shadowing false
 
 actor "Richiedente" as Richiedente

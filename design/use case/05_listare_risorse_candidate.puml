@@ -35,9 +35,9 @@ UCDomain --> UCFinal
 UCFinal --> Policy
 
 note right of UCFinal
-  La lista candidata non e' autorizzazione definitiva:
+  La lista candidata non è autorizzazione definitiva:
   applica DENY, DENY ereditati da altri padri,
-  entry proprie non matchanti ed ereditarieta.
+  entry proprie non matchanti ed ereditarietà.
 end note
 
 legend

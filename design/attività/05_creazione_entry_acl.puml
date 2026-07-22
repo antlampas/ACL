@@ -9,23 +9,23 @@
 skinparam backgroundColor white
 skinparam nodesep 80
 skinparam ranksep 80
-title ACT-05 - Creare o aggiornare una entry ACL
+title ACT-05 - Creare o aggiornare un'entry ACL
 skinparam shadowing false
 
 start
 :Ricevi identity e input entry;
 :Determina risorsa target;
-if (Target e' SYSTEM:global o <TYPE>:*?) then (si)
+if (Target è SYSTEM:global o <TYPE>:*?) then (sì)
   :Richiedi MANAGE_ACL su SYSTEM:global;
 else (no)
   :Richiedi MANAGE_ACL sulla risorsa concreta o su SYSTEM:global;
 endif
-if (gate autorizzato?) then (si)
+if (gate autorizzato?) then (sì)
   :Normalizza default profile_join=OR e subject_join=AND;
   :Valida INV-1..INV-5 strutturali;
-  if (Entry concede ALLOW su operation protected?) then (si)
+  if (Entry concede ALLOW su operation protected?) then (sì)
     :Invoca GrantConstraintPolicy;
-    if (Grant consentito?) then (si)
+    if (Grant consentito?) then (sì)
       :Continua;
     else (no)
       :GrantConstraintError;

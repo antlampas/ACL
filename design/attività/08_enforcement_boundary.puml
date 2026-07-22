@@ -16,24 +16,24 @@ start
 :Ricevi InvocationContext da qualunque origine;
 :IdentityResolver produce RequestIdentity;
 :RequestNormalizer determina operation e resource;
-if (Richiesta mappabile?) then (si)
+if (Richiesta mappabile?) then (sì)
   :Costruisci AuthorizationRequest;
 else (no)
   :Fallisci chiuso o applica fallback conservativo;
   :Mappa errore nell'esito esterno del chiamante;
   stop
 endif
-if (Richiesta di gestione ACL?) then (si)
+if (Richiesta di gestione ACL?) then (sì)
   :Invoca ACLService;
 else (no)
   :Invoca AuthorizationService.require(request);
 endif
-if (Autorizzato?) then (si)
+if (Autorizzato?) then (sì)
   :Esegue caso d'uso applicativo;
   stop
 else (no)
-  if (Identita assente o non valida?) then (si)
-    :Segnala richiesta di identita valida;
+  if (Identità assente o non valida?) then (sì)
+    :Segnala richiesta di identità valida;
   else (no)
     :Segnala diniego senza trace sensibili;
   endif

@@ -20,7 +20,7 @@ rectangle "Regole anti-escalation" {
   usecase "Modificare livelli\ne gruppi" as UCProfiles
   usecase "Richiedere\nMANAGE_PROFILES" as UCManageProfiles
   usecase "Concedere operazione\nprotected" as UCProtectedGrant
-  usecase "Verificare cosa il\nchiamante puo concedere" as UCGrantCheck
+  usecase "Verificare cosa il\nchiamante può concedere" as UCGrantCheck
   usecase "Rifiutare self-escalation" as UCSelfEscalation
   usecase "Ignorare claim esterni\nnon allowlistati" as UCExternalClaims
 }
@@ -37,7 +37,7 @@ note bottom of UCGrantCheck
   Esempi di policy:
   non concedere operazioni non possedute,
   non concedere protected senza globale,
-  non concedere soglie piu privilegiate della propria.
+  non concedere soglie più privilegiate della propria.
 end note
 
 legend

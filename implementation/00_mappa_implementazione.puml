@@ -32,7 +32,7 @@ rectangle "Classi" as Classi {
   rectangle "domain, service, porte" as CLSMore
 }
 
-rectangle "Attivita" as Attivita {
+rectangle "Attività" as Attivita {
   rectangle "attivita/00_mappa_attivita.puml" as ACT00
   rectangle "policy, normalizzazione, CRUD" as ACTMore
 }
@@ -64,7 +64,7 @@ legend
   Navigazione: [[use%20case/00_mappa_use_case.puml Use case]] |
   [[componenti/00_mappa_componenti.puml Componenti]] |
   [[classi/00_mappa_classi.puml Classi]] |
-  [[attivita/00_mappa_attivita.puml Attivita]] |
+  [[attivita/00_mappa_attivita.puml Attività]] |
   [[oggetti/00_mappa_oggetti.puml Oggetti]]
 endlegend
 @enduml

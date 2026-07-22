@@ -94,7 +94,7 @@ ACLService --> SeedingPolicy
 BootstrapService --> ACLService
 
 note bottom of AuthorizationService
-  Il service riceve richieste gia normalizzate
+  Il service riceve richieste già normalizzate
   e non interpreta il canale di origine.
 end note
 

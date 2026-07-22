@@ -11,28 +11,28 @@ SPDX-License-Identifier: CC-BY-SA-4.0
 
 ## 1. Scopo e principi guida
 
-Il sistema ACL definisce **chi** puo eseguire **quale operazione** su **quale
-risorsa**, con quale **verdetto**. L'unita atomica e' l'`ACLEntry`: una
+Il sistema ACL definisce **chi** può eseguire **quale operazione** su **quale
+risorsa**, con quale **verdetto**. L'unità atomica è l'`ACLEntry`: una
 dichiarazione persistita che combina soggetto, risorsa, operazione, permesso e
 criteri di profilo.
 
 Il documento descrive un sottosistema ACL riusabile, indipendente dai domini
 applicativi. Le applicazioni consumatrici forniscono il catalogo delle
-operazioni, la gerarchia delle risorse, la risoluzione dell'identita e la
+operazioni, la gerarchia delle risorse, la risoluzione dell'identità e la
 persistenza.
 
 Principi guida:
 
 1. **Autorizzazione dichiarativa a entry.** Ogni decisione deriva da `ACLEntry`
    persistite. Il dominio consumatore non deve cablare regole di accesso nelle
-   proprie entita.
+   proprie entità.
 2. **Autenticazione separata dall'autorizzazione.** Il sistema ACL non autentica:
-   riceve una richiesta autorizzativa con identita gia risolta e decide solo se
-   l'operazione e' consentita.
-3. **Qualificazione per livello e gruppo.** Ogni entry e' qualificata da un
+   riceve una richiesta autorizzativa con identità già risolta e decide solo se
+   l'operazione è consentita.
+3. **Qualificazione per livello e gruppo.** Ogni entry è qualificata da un
    livello, da un gruppo o da entrambi, valutati contro il profilo del
    richiedente.
-4. **Decisione pura e stateless.** La policy di autorizzazione e' una funzione
+4. **Decisione pura e stateless.** La policy di autorizzazione è una funzione
    deterministica che consulta solo porte astratte. Cache, database,
    credenziali, identity provider, protocolli e framework sono adapter esterni.
 5. **Default deny e precedenza conservativa.** In assenza di concessione
@@ -41,7 +41,7 @@ Principi guida:
    una richiesta normalizzata (`AuthorizationRequest`) prima dei casi d'uso. I
    service interni proteggono solo operazioni sensibili proprie, come gestione
    ACL e profili.
-7. **Nessuna ownership implicita.** Il creatore puo ricevere privilegi tramite
+7. **Nessuna ownership implicita.** Il creatore può ricevere privilegi tramite
    seeding di entry ordinarie, revocabili e ispezionabili; non esiste un bypass
    speciale del proprietario.
 
@@ -53,16 +53,16 @@ Principi guida:
 |---|------|--------------------|
 | D1 | Ruolo di soggetto, livello e gruppo | Sono criteri indipendenti e componibili. Ogni entry dichiara come combinarli tramite `profile_join` e `subject_join`. |
 | D2 | Operazione e permesso | **Operazione** = azione governata (`VIEW`, `EDIT`, `MANAGE_ACL`, ...). **Permesso** = verdetto `ALLOW` o `DENY`. |
-| D3 | Livelli e conflitti | Un requisito di livello `L` e' soddisfatto da chi ha `profile.level <= L`. La precedenza e' `DENY > ALLOW > DENIED`. |
-| D4 | Risorse e ambiti | Il modello supporta risorse concrete, radici di tipo `<TYPE>:*`, `SYSTEM:global`, soggetto `PUBLIC`, gerarchia ed ereditarieta. |
-| D5 | Profilo anonimo | I richiedenti anonimi ricevono `Profile(level = ANON_SENTINEL, groups = {"public"})`, cosi livello e gruppo sono sempre valutabili. |
-| D6 | Gruppi multipli | Un profilo puo appartenere a piu gruppi; i gruppi sono criteri di profilo, non soggetti ACL. |
-| D7 | Seeding al posto dell'ownership | La creazione di una risorsa puo materializzare entry iniziali tramite `SeedingPolicy`; sono entry ordinarie, revocabili e soggette a `DENY`. |
-| D8 | Orientamento numerico del livello | Numero piu basso = profilo piu privilegiato; numero alto = profilo meno privilegiato. |
+| D3 | Livelli e conflitti | Un requisito di livello `L` è soddisfatto da chi ha `profile.level <= L`. La precedenza è `DENY > ALLOW > DENIED`. |
+| D4 | Risorse e ambiti | Il modello supporta risorse concrete, radici di tipo `<TYPE>:*`, `SYSTEM:global`, soggetto `PUBLIC`, gerarchia ed ereditarietà. |
+| D5 | Profilo anonimo | I richiedenti anonimi ricevono `Profile(level = ANON_SENTINEL, groups = {"public"})`, così livello e gruppo sono sempre valutabili. |
+| D6 | Gruppi multipli | Un profilo può appartenere a più gruppi; i gruppi sono criteri di profilo, non soggetti ACL. |
+| D7 | Seeding al posto dell'ownership | La creazione di una risorsa può materializzare entry iniziali tramite `SeedingPolicy`; sono entry ordinarie, revocabili e soggette a `DENY`. |
+| D8 | Orientamento numerico del livello | Numero più basso = profilo più privilegiato; numero alto = profilo meno privilegiato. |
 | D9 | Catalogo operazioni | Ogni operazione dichiara almeno `read_only`, `inheritable` e `protected`. |
-| D10 | Mutazioni e anonimo | Nessuna entry `ALLOW` su operazione mutante puo essere soddisfatta dal profilo anonimo. |
-| D11 | Autoprotezione gestione ACL | Modificare entry tramite richieste di gestione richiede `MANAGE_ACL` sulla risorsa concreta oppure su `SYSTEM:global`; `SYSTEM:global` e radici `<TYPE>:*` richiedono sempre `MANAGE_ACL` globale. Gli hook di ciclo vita interni sono invocabili solo da casi d'uso gia autorizzati o dal bootstrap. |
-| D12 | Profili e grant protetti | Modificare livelli/gruppi e concedere operazioni protette sono responsabilita separate, mediate da `MANAGE_PROFILES` e `GrantConstraintPolicy`. |
+| D10 | Mutazioni e anonimo | Nessuna entry `ALLOW` su operazione mutante può essere soddisfatta dal profilo anonimo. |
+| D11 | Autoprotezione gestione ACL | Modificare entry tramite richieste di gestione richiede `MANAGE_ACL` sulla risorsa concreta oppure su `SYSTEM:global`; `SYSTEM:global` e radici `<TYPE>:*` richiedono sempre `MANAGE_ACL` globale. Gli hook di ciclo vita interni sono invocabili solo da casi d'uso già autorizzati o dal bootstrap. |
+| D12 | Profili e grant protetti | Modificare livelli/gruppi e concedere operazioni protette sono responsabilità separate, mediate da `MANAGE_PROFILES` e `GrantConstraintPolicy`. |
 | D13 | Richieste interfaccia-agnostiche | Il confine traduce qualunque invocazione in una richiesta autorizzativa normalizzata; il nucleo ACL non conosce canali, protocolli o runtime di origine. |
 
 ---
@@ -93,7 +93,7 @@ universale.
 
 ### 3.2 `SubjectRef`
 
-Il soggetto e' il criterio identitario dell'entry.
+Il soggetto è il criterio identitario dell'entry.
 
 | Tipo | Descrizione |
 |------|-------------|
@@ -107,11 +107,11 @@ estendere i tipi di soggetto, i service account possono essere rappresentati com
 
 `PUBLIC` non significa automaticamente "accesso anonimo": l'entry deve comunque
 matchare i criteri di profilo. Su operazioni mutanti vale INV-2, quindi il
-profilo anonimo non puo mai ottenere un `ALLOW`.
+profilo anonimo non può mai ottenere un `ALLOW`.
 
 ### 3.3 `ResourceRef`
 
-Una risorsa e' una coppia `(type, id)`.
+Una risorsa è una coppia `(type, id)`.
 
 | Forma | Significato |
 |-------|-------------|
@@ -127,7 +127,7 @@ amministrativi.
 
 ### 3.4 `OperationSpec`
 
-L'operazione e' l'azione governata. Il catalogo e' aperto, ma ogni operazione
+L'operazione è l'azione governata. Il catalogo è aperto, ma ogni operazione
 deve avere una specifica:
 
 ```text
@@ -140,7 +140,7 @@ OperationSpec
 
 Campi:
 
-- `read_only`: distingue letture da mutazioni ed e' usato dall'invariante
+- `read_only`: distingue letture da mutazioni ed è usato dall'invariante
   anti-anonimo (INV-2).
 - `inheritable`: abilita o vieta il fallback ai padri. `MANAGE_ACL` dovrebbe
   essere sempre non ereditabile.
@@ -174,7 +174,7 @@ Catalogo di esempio non normativo:
 
 ### 3.6 Livello
 
-Il livello e' un intero non negativo. Un criterio `level = L` e' soddisfatto
+Il livello è un intero non negativo. Un criterio `level = L` è soddisfatto
 quando:
 
 ```text
@@ -183,15 +183,15 @@ profile.level <= L
 
 Conseguenze:
 
-- un numero basso identifica un profilo piu privilegiato;
-- un `ALLOW` con soglia alta e' ampio;
-- un `DENY` con soglia alta e' molto restrittivo, perche matcha molti profili;
-- `ANON_SENTINEL` e' il livello meno privilegiato e puo essere usato come
+- un numero basso identifica un profilo più privilegiato;
+- un `ALLOW` con soglia alta è ampio;
+- un `DENY` con soglia alta è molto restrittivo, perché matcha molti profili;
+- `ANON_SENTINEL` è il livello meno privilegiato e può essere usato come
   **soglia universale**, soddisfatta da chiunque.
 
-`ANON_SENTINEL` e' un **valore riservato**: i profili ordinari (non anonimi) hanno
-`level` strettamente minore, cosi il sentinel identifica in modo univoco il
-profilo anonimo/meno privilegiato. Una entry puo invece usarlo legittimamente come
+`ANON_SENTINEL` è un **valore riservato**: i profili ordinari (non anonimi) hanno
+`level` strettamente minore, così il sentinel identifica in modo univoco il
+profilo anonimo/meno privilegiato. Un'entry può invece usarlo legittimamente come
 soglia universale. Lo storage deve rappresentarlo con margine (vedi
 `implementation/IMPLEMENTATION.md` §4.1 e §7.1).
 
@@ -201,15 +201,15 @@ indipendentemente dal suo tier corrente.
 
 ### 3.7 Gruppo
 
-Il gruppo e' un criterio di profilo. Un criterio `group = G` e' soddisfatto
+Il gruppo è un criterio di profilo. Un criterio `group = G` è soddisfatto
 quando:
 
 ```text
 G in profile.groups
 ```
 
-Il gruppo `"public"` e' implicito per ogni profilo, incluso quello anonimo. Non
-e' una membership ordinaria da assegnare o rimuovere: e' il criterio universale
+Il gruppo `"public"` è implicito per ogni profilo, incluso quello anonimo. Non
+è una membership ordinaria da assegnare o rimuovere: è il criterio universale
 per esprimere letture davvero pubbliche, come `ALLOW VIEW PUBLIC group=public`.
 
 I gruppi esterni, per esempio provenienti da OIDC o da un IdP, non sono
@@ -218,7 +218,7 @@ policy esplicita, deterministica e auditable del progetto consumatore.
 
 ### 3.8 `Profile`
 
-Il profilo e' il value object autorizzativo risolto a ogni richiesta.
+Il profilo è il value object autorizzativo risolto a ogni richiesta.
 
 ```text
 Profile
@@ -227,7 +227,7 @@ Profile
   version : int?                   # opzionale, utile per cache/revoca
 ```
 
-Il profilo anonimo e':
+Il profilo anonimo è:
 
 ```text
 Profile(level = ANON_SENTINEL, groups = {"public"})
@@ -237,8 +237,8 @@ Un soggetto non autenticato, inesistente, disabilitato o non verificabile riceve
 il profilo anonimo. In questo modo la valutazione non contiene rami speciali:
 anche l'anonimo passa dallo stesso algoritmo.
 
-`Profile.version` e' la versione autorevole del profilo; `RequestIdentity.authz_version`
-(sezione 3.9) e' lo snapshot trasportato dalla richiesta. Il confronto tra i due
+`Profile.version` è la versione autorevole del profilo; `RequestIdentity.authz_version`
+(sezione 3.9) è lo snapshot trasportato dalla richiesta. Il confronto tra i due
 serve solo a invalidare cache/credenziali stantie e non partecipa alla decisione,
 che usa sempre il `Profile` risolto dal `ProfileProvider`.
 
@@ -273,8 +273,8 @@ non DTO di trasporto. Il loro `metadata` non partecipa alla decisione ACL, salvo
 che il dominio consumatore lo trasformi prima in profilo autorevole, operazione
 o risorsa tramite policy esplicita e auditabile.
 
-Il mapping da invocazione concreta a `(identity, operation, resource)` e'
-responsabilita del confine di normalizzazione. Payload esterni non possono
+Il mapping da invocazione concreta a `(identity, operation, resource)` è
+responsabilità del confine di normalizzazione. Payload esterni non possono
 imporre direttamente il subject effettivo, alzare il livello del profilo o
 selezionare una risorsa diversa da quella derivata dal contesto affidabile.
 
@@ -286,16 +286,16 @@ canale che ha prodotto la richiesta.
 | ID | Invariante |
 |----|------------|
 | **INV-1** | Ogni `ACLEntry` ha almeno uno tra `level` e `group`. |
-| **INV-2** | Nessuna entry `ALLOW` su operazione non `read_only` puo matchare il profilo anonimo. Il controllo si esprime valutando l'entry contro `SubjectRef(PUBLIC)` e `Profile.anonymous()`. |
-| **INV-3** | `level`, se presente, e' un intero `>= 0`; `group`, se presente, e' non vuoto. |
+| **INV-2** | Nessuna entry `ALLOW` su operazione non `read_only` può matchare il profilo anonimo. Il controllo si esprime valutando l'entry contro `SubjectRef(PUBLIC)` e `Profile.anonymous()`. |
+| **INV-3** | `level`, se presente, è un intero `>= 0`; `group`, se presente, è non vuoto. |
 | **INV-4** | `profile_join` e `subject_join` sono valori validi; i default sono `OR` e `AND`. |
-| **INV-5** | `subject = PUBLIC` con `subject_join = OR` e' vietato: renderebbe vacui i criteri di profilo. |
+| **INV-5** | `subject = PUBLIC` con `subject_join = OR` è vietato: renderebbe vacui i criteri di profilo. |
 | **INV-6** | Entry su `SYSTEM:global` e radici `<TYPE>:*` sono modificabili solo da chi ha `MANAGE_ACL` su `SYSTEM:global`. |
 | **INV-7** | Entry che concedono operazioni `protected` devono passare da `GrantConstraintPolicy`. |
 
-INV-2 sostituisce la forma piu rigida "`PUBLIC` solo read-only". La forma
+INV-2 sostituisce la forma più rigida "`PUBLIC` solo read-only". La forma
 anti-anonimo conserva la sicurezza, ma permette entry come `ALLOW EDIT PUBLIC
-group=editors`: il soggetto e' pubblico solo come "nessuna restrizione
+group=editors`: il soggetto è pubblico solo come "nessuna restrizione
 identitaria", mentre il gruppo esclude l'anonimo.
 
 ---
@@ -328,18 +328,18 @@ identitaria", mentre il gruppo esclude l'anonimo.
 
 ## 5. Semantica di valutazione
 
-La domanda e' sempre:
+La domanda è sempre:
 
 ```text
 is_allowed(subject, operation, resource) -> Decision
 ```
 
-dove `Decision` e' almeno `ALLOWED` o `DENIED`; una implementazione puo arricchirla
+dove `Decision` è almeno `ALLOWED` o `DENIED`; un'implementazione può arricchirla
 con una traccia per audit amministrativo.
 
-### 5.1 Match di una entry
+### 5.1 Match di un'entry
 
-Per una entry e un richiedente:
+Per un'entry e un richiedente:
 
 ```text
 subjectMatch = entry.subject == PUBLIC
@@ -352,7 +352,7 @@ profilePart  = profile_join sui criteri presenti
 matches      = subject_join(subjectMatch, profilePart)
 ```
 
-`profile_join` combina solo i criteri presenti. Per INV-1 ce n'e' sempre almeno
+`profile_join` combina solo i criteri presenti. Per INV-1 ce n'è sempre almeno
 uno.
 
 Casi tipici con `subject_join = AND`:
@@ -366,8 +366,8 @@ Casi tipici con `subject_join = AND`:
 | `USER(a)` | `ANON_SENTINEL` | - | Solo l'utente `a`, indipendentemente dal profilo. |
 | `USER(a)` | `L` | - | L'utente `a`, solo se ha anche livello `<= L`. |
 
-`subject_join = OR` e' espressivo ma pericoloso: `USER(a) OR level<=L` concede
-ad `a` oppure a chiunque soddisfi la soglia. E' ammesso solo quando non viola
+`subject_join = OR` è espressivo ma pericoloso: `USER(a) OR level<=L` concede
+ad `a` oppure a chiunque soddisfi la soglia. È ammesso solo quando non viola
 INV-2 e non usa `PUBLIC` come soggetto.
 
 ### 5.2 Risoluzione
@@ -377,17 +377,17 @@ Algoritmo normativo:
 1. Risolvi `OperationSpec` da `OperationCatalog`.
 2. Risolvi il `Profile` del soggetto da `ProfileProvider`.
 3. Carica le entry proprie per `(resource, operation)`.
-4. Se esiste almeno una entry propria, la decisione si chiude su quelle:
+4. Se esiste almeno un'entry propria, la decisione si chiude su quelle:
    - se una `DENY` matcha -> `DENIED`;
    - altrimenti se una `ALLOW` matcha -> `ALLOWED`;
    - altrimenti -> `DENIED`.
 5. Se non ci sono entry proprie e `operation.inheritable = true`, valuta i padri
    forniti da `ResourceHierarchyProvider`.
-6. Con piu padri usa una OR non permissiva: un `DENY` matchante in qualunque
+6. Con più padri usa una OR non permissiva: un `DENY` matchante in qualunque
    ramo padre blocca le concessioni provenienti dagli altri padri.
 7. Solo se nessun ramo padre contiene un `DENY` matchante, basta almeno un padre
    `ALLOWED` per ottenere `ALLOWED`.
-8. Se nessun padre concede, o l'operazione non e' ereditabile, l'esito e'
+8. Se nessun padre concede, o l'operazione non è ereditabile, l'esito è
    `DENIED`.
 
 ```text
@@ -417,8 +417,8 @@ evaluate(resource, visited) -> EvaluationResult:
   return EvaluationResult(DENIED)
 ```
 
-La guardia anti-ciclo e' obbligatoria. Una risorsa con anche una sola entry
-propria per l'operazione non eredita quella operazione dai padri, nemmeno se
+La guardia anti-ciclo è obbligatoria. Una risorsa con anche una sola entry
+propria per l'operazione non eredita quell'operazione dai padri, nemmeno se
 l'entry propria non matcha.
 
 Il flag interno `explicit_deny` non cambia l'API pubblica, che restituisce
@@ -436,20 +436,20 @@ memoizzare i risultati di `evaluate` per risorsa entro la singola richiesta**:
 riduce la valutazione a lineare nel numero di risorse visitate. La cache resta
 scoped alla richiesta, coerente con la policy stateless.
 
-### 5.3 Ereditarieta
+### 5.3 Ereditarietà
 
-L'ereditarieta e' unidirezionale: figlio verso padre. Esempi:
+L'ereditarietà è unidirezionale: figlio verso padre. Esempi:
 
 - `PHOTO:<id> -> GALLERY:<id>` per foto contenute in gallerie;
 - `ACTIVITY:<id> -> OBJECTIVE:<id> -> ASSIGNMENT:<id> -> MISSION:<id> -> MISSION:*`;
 - `PERSON:<id> -> PERSON:*`;
 - `GROUP:<id> -> GROUP:*`.
 
-La struttura concreta e' dominio-specifica. Il sistema ACL richiede solo che
+La struttura concreta è dominio-specifica. Il sistema ACL richiede solo che
 `ResourceHierarchyProvider.parents_of(resource)` restituisca una lista finita di
 padri e che la policy protegga dai cicli.
 
-In presenza di padri multipli, l'ereditarieta resta figlio -> padre ma non e'
+In presenza di padri multipli, l'ereditarietà resta figlio -> padre ma non è
 permissiva: un ramo che incontra un `DENY` matchante rende l'esito `DENIED`
 anche se un altro ramo avrebbe prodotto `ALLOWED`. Un ramo che termina in
 default deny, senza `DENY` matchante, non blocca invece gli `ALLOW` degli altri
@@ -464,7 +464,7 @@ esplicita sulla risorsa stessa o un privilegio globale.
 `SYSTEM:global` rappresenta operazioni senza risorsa specifica:
 
 - creazione di nuove risorse (`CREATE`, `CREATE_MISSION`, ...);
-- gestione profili, identita, account e bootstrap;
+- gestione profili, identità, account e bootstrap;
 - privilegi amministrativi globali;
 - richieste di estensione non mappabili su una risorsa concreta.
 
@@ -479,30 +479,30 @@ ALLOW MANAGE_ACL PUBLIC level=admin_threshold resource=SYSTEM:global
 
 Le entry su `SYSTEM:global` e radici di tipo sono entry ordinarie in valutazione,
 ma non in gestione: per modificarle serve `MANAGE_ACL` globale (INV-6).
-Poiche `MANAGE_ACL` non e' ereditabile, una entry `MANAGE_ACL` su `<TYPE>:*`
+Poiché `MANAGE_ACL` non è ereditabile, un'entry `MANAGE_ACL` su `<TYPE>:*`
 non concede automaticamente la gestione delle ACL delle risorse concrete di quel
-tipo: per quelle serve una entry sulla risorsa concreta oppure `MANAGE_ACL` su
+tipo: per quelle serve un'entry sulla risorsa concreta oppure `MANAGE_ACL` su
 `SYSTEM:global`.
 
 ### 5.5 Risorse candidate per liste
 
-Per liste per-soggetto, la policy puo esporre:
+Per liste per-soggetto, la policy può esporre:
 
 ```text
 candidate_resources(subject, operation, resource_type) -> list[ResourceRef]
 ```
 
 Il metodo raccoglie risorse con almeno una `ALLOW` matchante, di solito tramite
-`ACLEntryRepository.list_by_operation(operation, resource_type)`. Non e' una
+`ACLEntryRepository.list_by_operation(operation, resource_type)`. Non è una
 decisione definitiva: il chiamante deve filtrare ogni candidata con
-`is_allowed()` per applicare `DENY`, entry proprie non matchanti ed ereditarieta,
+`is_allowed()` per applicare `DENY`, entry proprie non matchanti ed ereditarietà,
 incluso il blocco da `DENY` ereditato in qualunque ramo padre.
 Il metodo non deve essere interpretato come enumerazione completa dei discendenti
-accessibili tramite ereditarieta: per liste gerarchiche il dominio consumatore
+accessibili tramite ereditarietà: per liste gerarchiche il dominio consumatore
 deve combinare candidate esplicite, query di dominio sui figli dei padri
 candidati e filtro finale con `is_allowed()`.
 
-Per grandi dataset l'implementazione puo ottimizzare con:
+Per grandi dataset l'implementazione può ottimizzare con:
 
 - prefiltri su `subject_type`, `subject_id`, `group` e `resource_type`;
 - caricamento batch delle entry;
@@ -545,7 +545,7 @@ Il dominio consumatore decide quali operazioni seminare per tipo:
 
 - risorse che devono nascere private possono seminare `VIEW`, `EDIT`, `DELETE` e
   `MANAGE_ACL`;
-- risorse che devono ereditare la visibilita dal padre possono seminare solo
+- risorse che devono ereditare la visibilità dal padre possono seminare solo
   mutazioni operative e `MANAGE_ACL`;
 - risorse che devono restare governate da default globali possono seminare solo
   `MANAGE_ACL` oppure nulla.
@@ -572,7 +572,7 @@ Il sistema segue Ports & Adapters. Le dipendenze puntano verso il nucleo.
                                 |
 +-------------------------------v------------------------------+
 | Policy                                                        |
-| AuthorizationPolicy: match, precedenza, ereditarieta          |
+| AuthorizationPolicy: match, precedenza, ereditarietà          |
 +-------------------------------+------------------------------+
                                 |
 +-------------------------------v------------------------------+
@@ -601,19 +601,19 @@ Il domain non importa repository, framework, sessioni o database.
 
 ### 6.2 Ports
 
-| Porta | Responsabilita |
+| Porta | Responsabilità |
 |-------|----------------|
 | `ACLEntryRepository` | `entries_for(resource, operation)`, `list_by_operation(operation, resource_type)`, CRUD entry, `replace_entries`, `delete_by_resource`, `delete_by_subject`. |
-| `IdentityResolver` | Risolve `RequestIdentity` da un contesto di invocazione gia acquisito dal confine. |
-| `ProfileProvider` | Risolve `Profile` corrente per un `SubjectRef`; restituisce il profilo anonimo se il soggetto non e' valido. |
+| `IdentityResolver` | Risolve `RequestIdentity` da un contesto di invocazione già acquisito dal confine. |
+| `ProfileProvider` | Risolve `Profile` corrente per un `SubjectRef`; restituisce il profilo anonimo se il soggetto non è valido. |
 | `ResourceHierarchyProvider` | Restituisce i padri di una risorsa. |
 | `OperationCatalog` | Restituisce `OperationSpec` per nome operazione. |
-| `GrantConstraintPolicy` | Valida se il chiamante puo concedere una entry, soprattutto per operazioni `protected`. |
-| `PrincipalBindingPort` | Opzionale: collega il principal del sottosistema Auth a entita locali del dominio consumatore. |
+| `GrantConstraintPolicy` | Valida se il chiamante può concedere un'entry, soprattutto per operazioni `protected`. |
+| `PrincipalBindingPort` | Opzionale: collega il principal del sottosistema Auth a entità locali del dominio consumatore. |
 
 ### 6.3 `AuthorizationPolicy`
 
-E' la decisione pura.
+È la decisione pura.
 
 ```text
 AuthorizationPolicy
@@ -622,17 +622,17 @@ AuthorizationPolicy
   explain(subject, operation, resource) -> DecisionTrace
 ```
 
-Responsabilita:
+Responsabilità:
 
 - risolvere profilo e specifica operazione;
 - caricare entry proprie;
 - applicare match e precedenza;
-- valutare i padri se l'operazione e' ereditabile, applicando il blocco da
+- valutare i padri se l'operazione è ereditabile, applicando il blocco da
   `DENY` matchante in qualunque ramo padre;
 - proteggere dai cicli;
 - produrre una traccia esplicativa per audit/debug amministrativo.
 
-`explain` non deve essere esposto a utenti finali non autorizzati: puo rivelare
+`explain` non deve essere esposto a utenti finali non autorizzati: può rivelare
 struttura interna delle ACL.
 
 ### 6.4 `AuthorizationService`
@@ -680,15 +680,15 @@ Regole:
   sulla risorsa concreta o su `SYSTEM:global`;
 - gli stessi metodi, quando operano su `SYSTEM:global` o `<TYPE>:*`, richiedono
   sempre `MANAGE_ACL` su `SYSTEM:global`;
-- quando una entry `ALLOW` concede operazioni `protected`, invoca
+- quando un'entry `ALLOW` concede operazioni `protected`, invoca
   `GrantConstraintPolicy`;
 - `replace_entries` deve essere atomico rispetto alla risorsa;
 - `on_resource_created`, `delete_by_resource` e `delete_by_subject` sono hook di
   ciclo vita interni: non sono endpoint di amministrazione ACL e possono essere
-  invocati solo da casi d'uso gia autorizzati o dal bootstrap;
+  invocati solo da casi d'uso già autorizzati o dal bootstrap;
 - `on_resource_created` applica `SeedingPolicy` nella stessa transazione della
   creazione della risorsa, oppure con compensazione esplicita se il dominio non
-  puo condividere una transazione;
+  può condividere una transazione;
 - `delete_by_resource` e `delete_by_subject` sono usati per cascade sicure quando
   una risorsa o un soggetto vengono eliminati.
 
@@ -708,13 +708,13 @@ Pipeline normativa:
 4. una richiesta ordinaria diventa `AuthorizationRequest` e passa da
    `AuthorizationService.require`;
 5. una richiesta di gestione ACL passa da `ACLService`, che applica i gate
-   `MANAGE_ACL` piu precisi;
+   `MANAGE_ACL` più precisi;
 6. gli errori applicativi vengono trasformati dal confine nell'esito esterno
    appropriato, senza esporre trace non autorizzate.
 
-Se una richiesta non e' mappabile in modo univoco, il normalizzatore deve
-fallire chiuso. Un consumatore puo configurare fallback conservativi, per
-esempio una operazione protetta su `SYSTEM:global`, ma non fallback permissivi.
+Se una richiesta non è mappabile in modo univoco, il normalizzatore deve
+fallire chiuso. Un consumatore può configurare fallback conservativi, per
+esempio un'operazione protetta su `SYSTEM:global`, ma non fallback permissivi.
 
 ### 6.7 Direzione delle dipendenze
 
@@ -737,9 +737,9 @@ provider esterni.
 
 ## 7. Gestione ACL e prevenzione dell'escalation
 
-La gestione delle entry e' essa stessa governata da ACL. Le regole sono:
+La gestione delle entry è essa stessa governata da ACL. Le regole sono:
 
-1. **`MANAGE_ACL` non ereditabile.** Gestire la ACL di una risorsa e' un atto
+1. **`MANAGE_ACL` non ereditabile.** Gestire l'ACL di una risorsa è un atto
    esplicito su quella risorsa o un privilegio globale.
 2. **Chiave globale conservativa.** `MANAGE_ACL` su `SYSTEM:global` consente di
    gestire entry globali, radici di tipo e risorse concrete. Deve essere seminato
@@ -751,14 +751,14 @@ La gestione delle entry e' essa stessa governata da ACL. Le regole sono:
    gruppi richiede `MANAGE_PROFILES` o una policy amministrativa equivalente.
    Non deve essere ottenibile tramite `EDIT` dell'account, della persona o del
    profilo locale.
-5. **Grant protetti.** Un soggetto con `MANAGE_ACL` su una risorsa non puo
+5. **Grant protetti.** Un soggetto con `MANAGE_ACL` su una risorsa non può
    necessariamente concedere qualunque operazione. `GrantConstraintPolicy`
    applica regole come "non concedere operazioni che non possiedi", "non
    concedere `protected` senza autorizzazione globale" o "non concedere soglie
-   piu privilegiate della propria".
+   più privilegiate della propria".
 6. **Claim esterni non autorevoli per default.** Claim OIDC come `groups`,
    `roles` o `acl_level` possono essere usati solo tramite mapping esplicito e
-   allowlistato. L'IdP autentica l'identita; l'autorizzazione resta nel profilo
+   allowlistato. L'IdP autentica l'identità; l'autorizzazione resta nel profilo
    autorevole del sistema.
 7. **Input di richiesta non autorevole.** Plugin, estensioni e payload esterni non
    passano mai direttamente il subject effettivo: il subject arriva da
@@ -782,7 +782,7 @@ stato iniziale amministrabile senza introdurre bypass permanenti.
 
 | Gruppo | Uso |
 |--------|-----|
-| `public` | Implicito per tutti; non e' una membership ordinaria. |
+| `public` | Implicito per tutti; non è una membership ordinaria. |
 | `default` | Utenti standard abilitati a operazioni base, se il dominio lo desidera. |
 | `admins` | Amministratori, alternativa o complemento al livello 0. |
 | `service` | Service account, opzionale. |
@@ -797,7 +797,7 @@ write_threshold = 50
 admin_threshold = 0
 ```
 
-Il bootstrap puo materializzare entry come:
+Il bootstrap può materializzare entry come:
 
 | Ambito | Operazioni | Criterio |
 |--------|------------|----------|
@@ -812,12 +812,12 @@ ACL: radici e `SYSTEM:global` richiedono sempre `MANAGE_ACL` globale.
 
 ### 8.4 Primo amministratore
 
-Il primo amministratore e' creato da un flusso di setup unico, non da una regola
+Il primo amministratore è creato da un flusso di setup unico, non da una regola
 ACL preesistente. Dopo la creazione:
 
 - riceve livello `0` o gruppo amministrativo equivalente;
 - soddisfa le entry di bootstrap su `SYSTEM:global`;
-- puo gestire profili, radici e ACL globali.
+- può gestire profili, radici e ACL globali.
 
 In deployment OIDC-only, l'eventuale "primo login diventa admin" deve essere
 esplicito in configurazione e vincolato da issuer, audience, subject, dominio
@@ -844,7 +844,7 @@ Esempi non normativi:
 | Estensione non mappata mutante | `SYSTEM:global` | `EXECUTE` |
 
 Regola trasversale: se non esiste una `ALLOW` matchante, o se esiste un `DENY`
-matchante nel set decisivo, l'esito e' negato.
+matchante nel set decisivo, l'esito è negato.
 
 ---
 
@@ -859,12 +859,12 @@ dominio che le richiede:
 - eliminazione risorsa + `delete_by_resource`;
 - eliminazione soggetto + `delete_by_subject` e rimozione membership.
 
-Se lo stesso confine transazionale non e' possibile, il service deve prevedere
+Se lo stesso confine transazionale non è possibile, il service deve prevedere
 compensazioni esplicite e idempotenti.
 
 ### 10.2 Liste e performance
 
-`candidate_resources` e' una pre-selezione, non una autorizzazione definitiva.
+`candidate_resources` è una pre-selezione, non una autorizzazione definitiva.
 Ogni risultato esposto al chiamante va rifinito con `is_allowed`.
 
 Per grandi volumi:
@@ -881,8 +881,8 @@ Errori consigliati:
 
 | Errore | Significato | Esito di confine tipico |
 |--------|-------------|-------------------------|
-| `AuthenticationRequired` | identita richiesta ma assente/non valida | richiesta identita valida o avvia autenticazione esterna |
-| `AuthorizationDenied` | identita valida ma accesso negato | nega senza rivelare dettagli interni |
+| `AuthenticationRequired` | identità richiesta ma assente/non valida | richiesta identità valida o avvia autenticazione esterna |
+| `AuthorizationDenied` | identità valida ma accesso negato | nega senza rivelare dettagli interni |
 | `ACLValidationError` | entry viola INV-1..INV-7 | segnala input non valido |
 | `GrantConstraintError` | grant vietato da policy | nega o segnala grant non ammissibile |
 
@@ -895,7 +895,7 @@ Eventi minimi di audit:
 - `PROFILE_CHANGED`;
 - `BOOTSTRAP_COMPLETED`.
 
-La traccia di una decisione puo essere salvata in audit, ma non deve essere
+La traccia di una decisione può essere salvata in audit, ma non deve essere
 restituita a soggetti non autorizzati.
 
 ### 10.4 Default ergonomici dei normalizzatori
@@ -907,7 +907,7 @@ sempre rivalidare:
 - entry `PUBLIC` senza criteri -> suggerire gruppo `public`;
 - operazioni mutanti con `PUBLIC public` -> rifiutare per INV-2;
 - input esterni non devono poter inviare subject arbitrari al posto
-  dell'identita risolta.
+  dell'identità risolta.
 
 ---
 
@@ -915,21 +915,21 @@ sempre rivalidare:
 
 ### 11.1 Entry a criteri componibili
 
-Un'unica entry contiene identita, risorsa, operazione, verdetto e criteri di
+Un'unica entry contiene identità, risorsa, operazione, verdetto e criteri di
 profilo. Questo evita sottosistemi paralleli per ruoli, proprietari impliciti e
 permessi globali.
 
 ### 11.2 INV-2 anti-anonimo
 
-La regola "PUBLIC solo read-only" e' semplice ma troppo rigida: impedisce
+La regola "PUBLIC solo read-only" è semplice ma troppo rigida: impedisce
 concessioni mutanti a gruppi o livelli usando `PUBLIC` come assenza di vincolo
-identitario. La forma anti-anonimo e' piu generale e mantiene la proprieta di
-sicurezza essenziale: un richiedente anonimo non puo mutare.
+identitario. La forma anti-anonimo è più generale e mantiene la proprietà di
+sicurezza essenziale: un richiedente anonimo non può mutare.
 
 ### 11.3 Radici di tipo
 
 `<TYPE>:*` consente default per categoria senza duplicare entry su ogni risorsa.
-La valutazione resta una normale ereditarieta, mentre la gestione resta protetta
+La valutazione resta una normale ereditarietà, mentre la gestione resta protetta
 da `MANAGE_ACL` globale.
 
 ### 11.4 Nessuna ownership
@@ -941,14 +941,14 @@ soggetto a `DENY`.
 ### 11.5 Policy pura e facade applicativa
 
 `AuthorizationPolicy` resta piccola e testabile; `AuthorizationService` e
-`ACLService` traducono richieste normalizzate, identita, errori, DTO,
+`ACLService` traducono richieste normalizzate, identità, errori, DTO,
 transazioni e autoprotezione. La separazione mantiene la single responsibility:
 la policy decide, il service orchestra, gli adapter di richiesta parlano con il
 mondo esterno.
 
 ### 11.6 Claim esterni non autorevoli
 
-Separare identita e autorizzazione evita escalation tramite configurazioni IdP.
+Separare identità e autorizzazione evita escalation tramite configurazioni IdP.
 OIDC, LDAP o altri provider possono autenticare e fornire hint; la decisione
 autorizzativa usa il profilo autorevole risolto da `ProfileProvider`.
 
@@ -961,7 +961,7 @@ autorizzativa usa il profilo autorevole risolto da `ProfileProvider`.
 | Invarianti | INV-1..INV-7, inclusi `PUBLIC + subject_join=OR`, mutazioni anonime negate e grant protetti. |
 | Match | livello, gruppo, join `AND/OR`, soglia universale, soggetto specifico e `PUBLIC`. |
 | Risoluzione | `DENY` wins, default deny, entry proprie che chiudono la decisione. |
-| Ereditarieta | padre singolo, multi-padre con `DENY` bloccante, default deny di un padre non bloccante, cicli, operazioni non ereditabili. |
+| Ereditarietà | padre singolo, multi-padre con `DENY` bloccante, default deny di un padre non bloccante, cicli, operazioni non ereditabili. |
 | Sistema e radici | `SYSTEM:global`, `<TYPE>:*`, modifica solo con `MANAGE_ACL` globale. |
 | Seeding | entry del creatore, revoca successiva, configurazioni per tipo, transazione/compensazione. |
 | Candidate list | solo `ALLOW` candidate, rifinitura con `is_allowed`, applicazione dei `DENY`. |
@@ -981,8 +981,8 @@ autorizzativa usa il profilo autorevole risolto da `ProfileProvider`.
 | `OperationSpec` | Metadati dell'operazione: `read_only`, `inheritable`, `protected`. |
 | `Permission` | Verdetto `ALLOW` o `DENY`. |
 | `Profile` | Livello e gruppi del richiedente, risolti a ogni richiesta. |
-| `RequestIdentity` | Identita risolta per una richiesta, indipendente dal canale di origine. |
-| `AuthorizationRequest` | Richiesta normalizzata con identita, operazione e risorsa. |
+| `RequestIdentity` | Identità risolta per una richiesta, indipendente dal canale di origine. |
+| `AuthorizationRequest` | Richiesta normalizzata con identità, operazione e risorsa. |
 | `ANON_SENTINEL` | Livello massimo/meno privilegiato, usato dal profilo anonimo e come soglia universale. |
 | `public` | Gruppo implicito universale. |
 | `SYSTEM:global` | Ambito globale per operazioni non legate a una risorsa concreta. |
@@ -991,7 +991,7 @@ autorizzativa usa il profilo autorevole risolto da `ProfileProvider`.
 | `RequestNormalizer` | Componente di confine che normalizza un contesto di invocazione in richieste ACL. |
 | `AuthorizationService` | Facade applicativa per `require`, liste candidate e trace su richieste normalizzate. |
 | `ACLService` | Service applicativo che gestisce entry, seeding, bootstrap e cascade. |
-| `GrantConstraintPolicy` | Policy che limita cosa puo essere concesso da chi gestisce ACL. |
+| `GrantConstraintPolicy` | Policy che limita cosa può essere concesso da chi gestisce ACL. |
 | `SeedingPolicy` | Configurazione che materializza entry iniziali alla creazione risorsa. |
 | `MANAGE_ACL` | Operazione protetta per gestire entry ACL. |
 | `MANAGE_PROFILES` | Operazione protetta per modificare livelli e gruppi dei profili. |

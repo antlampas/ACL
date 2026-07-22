@@ -32,7 +32,7 @@ object "Precedenza DENY" as DenyWins {
   rule = "DENY > ALLOW > DENIED"
 }
 
-object "Ereditarieta" as Inheritance {
+object "Ereditarietà" as Inheritance {
   diagram = "05_ereditarieta_photo_gallery"
   path = "PHOTO:id -> GALLERY:id -> PHOTO:*"
 }
@@ -73,7 +73,7 @@ Bootstrap --> SeedCreator : policy dopo setup
 
 legend
   Navigazione: [[../use%20case/00_mappa_use_case.puml Use case]] |
-  [[../attivit%C3%A0/01_valutazione_is_allowed.puml Attivita]] |
+  [[../attivit%C3%A0/01_valutazione_is_allowed.puml Attività]] |
   [[../classi/00_modello_concettuale.puml Classi]]
 endlegend
 @enduml

@@ -56,7 +56,7 @@ AuditRecord --> AuditEvent
 AuditRecord --> DecisionTrace
 
 note bottom of DecisionTrace
-  La trace e' utile per audit/debug amministrativo.
+  La trace è utile per audit/debug amministrativo.
   Non va esposta a soggetti finali non autorizzati.
 end note
 

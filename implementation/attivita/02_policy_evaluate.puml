@@ -16,28 +16,28 @@ start
 :operations.require(operation);
 :profiles.profile_of(subject);
 :evaluate(resource, visited=empty);
-if (resource gia visitata?) then (si)
+if (resource già visitata?) then (sì)
   :Decision DENIED per ciclo;
   stop
 endif
 :entries.entries_for(resource, operation);
-if (Entry proprie presenti?) then (si)
+if (Entry proprie presenti?) then (sì)
   :resolve(entries, subject, profile);
-  if (DENY matchante?) then (si)
+  if (DENY matchante?) then (sì)
     :DENIED explicit_deny=true;
-  elseif (ALLOW matchante?) then (si)
+  elseif (ALLOW matchante?) then (sì)
     :ALLOWED;
   else (no)
     :DENIED default;
   endif
   stop
 else (no)
-  if (operation.inheritable?) then (si)
+  if (operation.inheritable?) then (sì)
     :parents = hierarchy.parents_of(resource);
     :Valuta tutti i padri;
-    if (Qualunque padre explicit_deny?) then (si)
+    if (Qualunque padre explicit_deny?) then (sì)
       :DENIED explicit_deny=true;
-    elseif (Almeno un padre ALLOWED?) then (si)
+    elseif (Almeno un padre ALLOWED?) then (sì)
       :ALLOWED;
     else (no)
       :DENIED default;

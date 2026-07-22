@@ -19,7 +19,7 @@ start
 :operation = request.operation;
 :resource = request.resource;
 :Invoca AuthorizationPolicy.is_allowed(subject, operation, resource);
-if (Decision == ALLOWED?) then (si)
+if (Decision == ALLOWED?) then (sì)
   :Restituisci successo;
   stop
 else (no)

@@ -9,12 +9,12 @@
 skinparam backgroundColor white
 skinparam nodesep 80
 skinparam ranksep 80
-title CMP-05 - Identita, profili e claim esterni
+title CMP-05 - Identità, profili e claim esterni
 skinparam shadowing false
 skinparam componentStyle rectangle
 left to right direction
 
-package "Contesti identita" as Channels {
+package "Contesti identità" as Channels {
   component "Credenziale esterna" as ExternalCredential
   component "Principal locale\ntrusted" as LocalPrincipal
   component "Contesto servizio" as ServiceContext
@@ -30,7 +30,7 @@ package "Risoluzione locale" as LocalResolution {
 package "Fonti profilo" as Sources {
   component "Profile store\nautorevole" as ProfileStore
   component "External claim mapping\nallowlistato" as ClaimMapping
-  component "Provider identita\nesterno" as IdP
+  component "Provider identità\nesterno" as IdP
 }
 
 ExternalCredential --> IdentityResolver

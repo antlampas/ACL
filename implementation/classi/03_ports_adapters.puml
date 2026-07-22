@@ -81,7 +81,7 @@ ACLService ..> AuditLogger
 
 note bottom of RequestNormalizer
   Il normalizzatore fallisce chiuso
-  se la richiesta e' assente o ambigua.
+  se la richiesta è assente o ambigua.
 end note
 
 legend

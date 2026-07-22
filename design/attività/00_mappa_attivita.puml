@@ -9,26 +9,26 @@
 skinparam backgroundColor white
 skinparam nodesep 80
 skinparam ranksep 80
-title ACT-00 - Indice dei flussi di attivita ACL
+title ACT-00 - Indice dei flussi di attività ACL
 skinparam shadowing false
 
 start
 :Richiesta o evento di dominio;
-if (Flusso di autorizzazione?) then (si)
+if (Flusso di autorizzazione?) then (sì)
   :[[01_valutazione_is_allowed.puml ACT-01 is_allowed]];
   :[[02_match_entry.puml ACT-02 match entry]];
-  :[[03_ereditarieta_multi_padre.puml ACT-03 ereditarieta]];
-elseif (Flusso liste?) then (si)
+  :[[03_ereditarieta_multi_padre.puml ACT-03 ereditarietà]];
+elseif (Flusso liste?) then (sì)
   :[[04_candidate_resources.puml ACT-04 candidate_resources]];
-elseif (Flusso gestione ACL?) then (si)
+elseif (Flusso gestione ACL?) then (sì)
   :[[05_creazione_entry_acl.puml ACT-05 gestione entry]];
   :[[09_grant_protetti.puml ACT-09 grant protetti]];
-elseif (Flusso lifecycle?) then (si)
+elseif (Flusso lifecycle?) then (sì)
   :[[06_creazione_risorsa_seeding.puml ACT-06 seeding]];
   :[[07_bootstrap_setup.puml ACT-07 bootstrap]];
-elseif (Flusso confine?) then (si)
+elseif (Flusso confine?) then (sì)
   :[[08_enforcement_boundary.puml ACT-08 richiesta normalizzata]];
-else (identita)
+else (identità)
   :[[10_risoluzione_profilo.puml ACT-10 profilo]];
 endif
 :Decisione, persistenza o errore applicativo;

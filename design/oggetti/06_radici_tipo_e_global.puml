@@ -57,8 +57,8 @@ GlobalManage --> MissionRoot : richiesto per modificare radici
 GlobalManage --> SystemGlobal : richiesto per globale
 
 note right of LocalManage
-  MANAGE_ACL non e' ereditabile.
-  Una entry su MISSION:* non concede gestione ACL
+  MANAGE_ACL non è ereditabile.
+  Un'entry su MISSION:* non concede gestione ACL
   automatica su MISSION:5.
 end note
 

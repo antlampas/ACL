@@ -49,9 +49,9 @@ ACLEntryInvariants ..> ACLValidationError
 GrantConstraintPolicy ..> GrantConstraintError
 
 note right of GrantConstraintPolicy
-  Limita cosa puo essere concesso:
+  Limita cosa può essere concesso:
   operazioni possedute, protected globali,
-  soglie non piu privilegiate del chiamante.
+  soglie non più privilegiate del chiamante.
 end note
 
 legend

@@ -21,9 +21,9 @@ start
 :Deduplica ResourceRef candidate;
 :Ordina in modo stabile;
 :Restituisci pre-selezione;
-while (Per ogni candidata esposta dal chiamante?) is (si)
+while (Per ogni candidata esposta dal chiamante?) is (sì)
   :Richiama is_allowed su risorsa concreta;
-  if (ALLOWED?) then (si)
+  if (ALLOWED?) then (sì)
     :Mantieni nel risultato finale;
   else (no)
     :Scarta;
@@ -34,7 +34,7 @@ stop
 
 note right
   La pre-selezione non sostituisce is_allowed:
-  DENY, entry proprie non matchanti ed ereditarieta
+  DENY, entry proprie non matchanti ed ereditarietà
   sono applicati dal filtro finale.
 end note
 

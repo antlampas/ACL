@@ -9,14 +9,14 @@
 skinparam backgroundColor white
 skinparam nodesep 80
 skinparam ranksep 80
-title ACT-10 - Risoluzione identita e profilo autorizzativo
+title ACT-10 - Risoluzione identità e profilo autorizzativo
 skinparam shadowing false
 
 start
 :IdentityResolver riceve InvocationContext normalizzato;
-if (Principal verificabile?) then (si)
+if (Principal verificabile?) then (sì)
   :PrincipalBindingPort collega principal a SubjectRef locale;
-  if (Subject locale valido e abilitato?) then (si)
+  if (Subject locale valido e abilitato?) then (sì)
     :ProfileProvider carica livello e gruppi autorevoli;
     :Aggiunge sempre gruppo public;
     :Restituisce Profile(level, groups, version?);
@@ -25,7 +25,7 @@ if (Principal verificabile?) then (si)
     :Subject inesistente o disabilitato;
   endif
 else (no)
-  :Identita assente o non verificabile;
+  :Identità assente o non verificabile;
 endif
 :Restituisce Profile.anonymous();
 :Profile(level=ANON_SENTINEL, groups={public});
@@ -37,7 +37,7 @@ note right
 end note
 
 legend
-  Vedi anche: [[../componenti/05_identita_profili.puml Componenti identita]] |
+  Vedi anche: [[../componenti/05_identita_profili.puml Componenti identità]] |
   [[../oggetti/08_profilo_anonimo.puml Oggetto anonimo]]
 endlegend
 @enduml

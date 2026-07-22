@@ -5,9 +5,9 @@
 ![Licenza: CC BY-SA 4.0](https://img.shields.io/badge/licenza-CC%20BY--SA%204.0-lightgrey.svg)
 
 Questo repository raccoglie la specifica progettuale e implementativa di un
-sottosistema ACL riusabile. L'obiettivo e' descrivere un modello di
+sottosistema ACL riusabile. L'obiettivo è descrivere un modello di
 autorizzazione dichiarativo, default-deny e indipendente dai domini applicativi:
-le applicazioni consumatrici forniscono identita, catalogo operazioni,
+le applicazioni consumatrici forniscono identità, catalogo operazioni,
 gerarchia risorse, persistenza e adapter di integrazione.
 
 Il nucleo concettuale ruota attorno ad `ACLEntry`, `SubjectRef`, `ResourceRef`,
@@ -20,7 +20,7 @@ application, infrastructure, adapters e bootstrap.
 
 Il checkout contiene la specifica progettuale, la specifica implementativa, i
 diagrammi PlantUML di supporto, una prima implementazione Python e una suite di
-test. La struttura corrente e':
+test. La struttura corrente è:
 
 ```text
 src/             codice di produzione
@@ -40,15 +40,12 @@ interna autorevole del sottosistema.
 - [design/DESIGN.md](design/DESIGN.md): documento architetturale di
   riferimento per modello ACL, decisioni, invarianti, policy e confini.
 - [design/](design/): diagrammi PlantUML progettuali per use case, componenti,
-  classi, oggetti e attivita.
+  classi, oggetti e attività.
 - [implementation/IMPLEMENTATION.md](implementation/IMPLEMENTATION.md):
-  specifica implementativa per package layout, responsabilita dei layer, porte,
+  specifica implementativa per package layout, responsabilità dei layer, porte,
   servizi e adapter.
 - [implementation/](implementation/): diagrammi PlantUML implementativi per
-  pipeline, oggetti, attivita, componenti e mapping di persistenza.
-- [AGENTS.md](AGENTS.md): linee guida operative locali per manutenzione, stile,
-  controlli e sicurezza.
-- [CLAUDE.md](CLAUDE.md): linee guida equivalenti per Claude Code.
+  pipeline, oggetti, attività, componenti e mapping di persistenza.
 
 Mappe principali:
 
@@ -77,11 +74,11 @@ python -m compileall -q src tests
 python -m pytest
 rg -n "INV-|D[0-9]" design/DESIGN.md
 find design implementation -name '*.puml' -print
-markdownlint README.md design/DESIGN.md implementation/IMPLEMENTATION.md AGENTS.md CLAUDE.md
+markdownlint README.md design/DESIGN.md implementation/IMPLEMENTATION.md
 git diff --check
 ```
 
-`markdownlint` e' opzionale: eseguirlo solo se disponibile nell'ambiente.
+`markdownlint` è opzionale: eseguirlo solo se disponibile nell'ambiente.
 
 ## Licenza
 

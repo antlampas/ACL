@@ -46,7 +46,7 @@ ResourceRef <|-- TypeRoot
 ResourceRef <|-- ConcreteResource
 OperationCatalog --> OperationSpec
 ResourceHierarchyProvider --> ResourceRef
-ConcreteResource --> TypeRoot : puo ereditare da
+ConcreteResource --> TypeRoot : può ereditare da
 ConcreteResource --> ConcreteResource : padre dominio-specifico
 
 note right of OperationSpec

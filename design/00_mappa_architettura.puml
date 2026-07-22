@@ -27,7 +27,7 @@ rectangle "componenti" as Componenti {
   rectangle "01..07 componenti" as CMPMore
 }
 
-rectangle "attivita" as Attivita {
+rectangle "attività" as Attivita {
   rectangle "00_mappa_attivita.puml" as ACT00
   rectangle "01..10 flussi" as ACTMore
 }
@@ -58,14 +58,14 @@ note bottom
   Ingresso rapido:
   [[use%20case/00_mappa_use_case.puml Use case]] |
   [[componenti/00_mappa_componenti.puml Componenti]] |
-  [[attivit%C3%A0/00_mappa_attivita.puml Attivita]] |
+  [[attivit%C3%A0/00_mappa_attivita.puml Attività]] |
   [[classi/00_modello_concettuale.puml Classi]] |
   [[oggetti/00_mappa_oggetti.puml Oggetti]]
 
   Relazioni:
   DESIGN.md -> use case: attori e casi d'uso
   DESIGN.md -> componenti: layer e porte
-  DESIGN.md -> attivita: algoritmi e workflow
+  DESIGN.md -> attività: algoritmi e workflow
   DESIGN.md -> classi: modello e contratti
   DESIGN.md -> oggetti: istanze esemplari
 end note

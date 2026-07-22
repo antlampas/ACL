@@ -30,7 +30,7 @@ UCAudit --> Audit
 EndUser --> UCHide
 
 note right of UCTrace
-  La trace puo rivelare struttura interna ACL.
+  La trace può rivelare struttura interna ACL.
   Non va restituita a utenti finali non autorizzati.
 end note
 

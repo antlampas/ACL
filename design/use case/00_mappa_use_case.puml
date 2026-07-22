@@ -60,7 +60,7 @@ end note
 
 legend
   Navigazione: [[../componenti/00_mappa_componenti.puml Componenti]] |
-  [[../attivit%C3%A0/00_mappa_attivita.puml Attivita]] |
+  [[../attivit%C3%A0/00_mappa_attivita.puml Attività]] |
   [[../classi/00_modello_concettuale.puml Classi]] |
   [[../oggetti/00_mappa_oggetti.puml Oggetti]]
 endlegend

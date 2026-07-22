@@ -17,13 +17,13 @@ start
 :operations.require(input.operation);
 :Applica default ergonomici;
 :Costruisci ACLEntry immutabile;
-if (Entry su SYSTEM:global o TYPE:*?) then (si)
+if (Entry su SYSTEM:global o TYPE:*?) then (sì)
   :Richiedi MANAGE_ACL su SYSTEM:global;
 else (no)
   :Richiedi MANAGE_ACL su risorsa o SYSTEM:global;
 endif
 :Valida INV-1..INV-5 strutturali;
-if (ALLOW su operation protected?) then (si)
+if (ALLOW su operation protected?) then (sì)
   :GrantConstraintPolicy.validate_grant;
 endif
 :Valida INV-6 e INV-7;

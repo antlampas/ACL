@@ -71,7 +71,7 @@ Profile "1" o-- "*" GroupId : groups
 OperationSpec --> Decision : contribuisce a
 
 note bottom of ACLEntry
-  Unita atomica persistita:
+  Unità atomica persistita:
   chi, su cosa, quale operazione,
   verdetto e criteri di profilo.
 end note

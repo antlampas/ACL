@@ -14,15 +14,15 @@ skinparam shadowing false
 
 start
 :ACLService riceve entry da creare o aggiornare;
-if (permission == ALLOW?) then (si)
+if (permission == ALLOW?) then (sì)
   :Risolvi OperationSpec;
-  if (operation.protected?) then (si)
+  if (operation.protected?) then (sì)
     :Invoca GrantConstraintPolicy;
-    if (Chiamante puo concedere questa operazione?) then (si)
-      if (Soglia/gruppo non supera limiti del chiamante?) then (si)
+    if (Chiamante può concedere questa operazione?) then (sì)
+      if (Soglia/gruppo non supera limiti del chiamante?) then (sì)
         :Grant consentito;
       else (no)
-        :Rifiuta soglia piu privilegiata;
+        :Rifiuta soglia più privilegiata;
         stop
       endif
     else (no)

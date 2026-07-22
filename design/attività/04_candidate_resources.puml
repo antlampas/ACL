@@ -18,13 +18,13 @@ start
 :Repo.list_by_operation(operation, resource_type);
 :Prefiltra entry ALLOW matchanti per subject/profile;
 :Costruisci lista risorse candidate esplicite;
-if (Dominio ha liste gerarchiche?) then (si)
+if (Dominio ha liste gerarchiche?) then (sì)
   :Il dominio aggiunge figli di padri candidati;
 else (no)
   :Usa solo candidate esplicite;
 endif
 :Per ogni risorsa candidata invoca is_allowed;
-if (is_allowed == ALLOWED?) then (si)
+if (is_allowed == ALLOWED?) then (sì)
   :Espone la risorsa al chiamante;
 else (no)
   :Scarta la risorsa;
@@ -35,7 +35,7 @@ stop
 note right
   La pre-selezione non applica in modo definitivo DENY,
   DENY ereditati da altri padri, entry proprie non
-  matchanti o ereditarieta completa.
+  matchanti o ereditarietà completa.
 end note
 
 legend

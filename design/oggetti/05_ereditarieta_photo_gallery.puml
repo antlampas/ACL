@@ -9,7 +9,7 @@
 skinparam backgroundColor white
 skinparam nodesep 80
 skinparam ranksep 80
-title OBJ-05 - Ereditarieta: PHOTO -> GALLERY -> PHOTO:*
+title OBJ-05 - Ereditarietà: PHOTO -> GALLERY -> PHOTO:*
 skinparam shadowing false
 
 object "photo42 : ResourceRef" as Photo {

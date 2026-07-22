@@ -13,16 +13,16 @@ title IMPL-ACT-05 - BootstrapService e SeedingPolicy
 skinparam shadowing false
 
 start
-if (Repository ACL vuoto?) then (si)
+if (Repository ACL vuoto?) then (sì)
   :Crea primo amministratore controllato;
   :Materializza entry bootstrap;
   :Audit BOOTSTRAP_COMPLETED;
 else (no)
   :Non sovrascrivere entry esistenti;
 endif
-if (Risorsa creata dal dominio?) then (si)
+if (Risorsa creata dal dominio?) then (sì)
   :ACLService.on_resource_created(resource, creator, type);
-  if (SeedingPolicy abilitata per type?) then (si)
+  if (SeedingPolicy abilitata per type?) then (sì)
     :Genera entry ALLOW per creator;
     :Valida invarianti e grant;
     :Salva nella stessa transazione se possibile;

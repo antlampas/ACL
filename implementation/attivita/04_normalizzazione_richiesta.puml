@@ -16,24 +16,24 @@ start
 :Ricevi InvocationContext;
 :identity = IdentityResolver.resolve(context);
 :Trova RequestMappingRule tramite selector;
-if (Regola unica?) then (si)
+if (Regola unica?) then (sì)
   :Risolvi operation;
-  if (resource_type assente?) then (si)
+  if (resource_type assente?) then (sì)
     :resource = ResourceRef.system();
-  elseif (resource_id_source assente?) then (si)
+  elseif (resource_id_source assente?) then (sì)
     :resource = ResourceRef.type_root(resource_type);
   else (no)
     :Risolvi id da sorgente affidabile;
     :resource = ResourceRef(resource_type, id);
   endif
-  if (Richiesta lista candidate?) then (si)
+  if (Richiesta lista candidate?) then (sì)
     :Crea CandidateResourcesRequest;
   else (no)
     :Crea AuthorizationRequest;
   endif
   stop
 else (no)
-  if (Fallback conservativo configurato?) then (si)
+  if (Fallback conservativo configurato?) then (sì)
     :Crea richiesta protetta su SYSTEM:global;
     stop
   else (no)

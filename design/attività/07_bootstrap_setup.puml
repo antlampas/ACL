@@ -14,9 +14,9 @@ skinparam shadowing false
 
 start
 :Sistema iniziale senza entry ACL;
-:Tutto e' deny-by-default;
+:Tutto è deny-by-default;
 :Avvia setup unico controllato;
-if (Deployment OIDC-only?) then (si)
+if (Deployment OIDC-only?) then (sì)
   :Verifica issuer, audience, subject, dominio email o gruppo IdP allowlistato;
 else (no)
   :Usa canale bootstrap locale controllato;

@@ -17,7 +17,7 @@ actor "Chiamante" as Caller
 actor "Gestore ACL" as AclAdmin
 actor "Bootstrap operator" as Bootstrap
 actor "Dominio consumatore" as Domain
-actor "Osservabilita" as Observability
+actor "Osservabilità" as Observability
 
 rectangle "Package ACL" {
   usecase "Normalizzare\nrichiesta" as UCNormalize

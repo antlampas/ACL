@@ -9,24 +9,24 @@
 skinparam backgroundColor white
 skinparam nodesep 80
 skinparam ranksep 80
-title ACT-03 - Ereditarieta e padri multipli
+title ACT-03 - Ereditarietà e padri multipli
 skinparam shadowing false
 
 start
 :La risorsa non ha entry proprie per l'operazione;
-if (operation.inheritable?) then (si)
+if (operation.inheritable?) then (sì)
   :Ottieni parents_of(resource);
-  if (Lista padri vuota?) then (si)
+  if (Lista padri vuota?) then (sì)
     :DENIED;
     stop
   else (no)
     :Valuta tutti i padri con visited set anti-ciclo;
     :Ogni ramo produce decision + explicit_deny;
-    if (Un ramo padre contiene DENY matchante?) then (si)
+    if (Un ramo padre contiene DENY matchante?) then (sì)
       :DENIED;
       stop
     else (no)
-      if (Almeno un padre restituisce ALLOWED?) then (si)
+      if (Almeno un padre restituisce ALLOWED?) then (sì)
         :ALLOWED;
         stop
       else (no)
@@ -41,7 +41,7 @@ else (no)
 endif
 
 note right
-  Con padri multipli la OR e' non permissiva:
+  Con padri multipli la OR è non permissiva:
   un DENY matchante in qualunque ramo padre
   blocca le ALLOW degli altri padri.
 
